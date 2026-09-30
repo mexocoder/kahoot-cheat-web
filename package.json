@@ -11,7 +11,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "express": "^4.19.2",
-    "kahoot-api": "^1.4.0",
+    "kahoot.js-updated": "github:theusaf/kahoot.js-updated",
     "socket.io": "^4.7.5"
   }
 }
