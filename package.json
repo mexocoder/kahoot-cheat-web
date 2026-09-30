@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "express": "^4.19.2",
-    "kahoot.js-updated": "github:theusaf/kahoot.js-updated",
+    "kahoot.js-updated": "github:theusaf/kahoot.js-updated#build",
     "socket.io": "^4.7.5"
   }
 }
