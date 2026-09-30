@@ -1,1 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kahoot Cheat Web</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #1e1e1e; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 320px; text-align: center; }
+        h2 { margin-top: 0; color: #4caf50; }
+        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: none; box-sizing: border-box; font-size: 14px; }
+        input { background: #2a2a2a; color: white; outline: none; }
+        input:focus { border: 1px solid #4caf50; }
+        button { background: #4caf50; color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #45a049; }
+        #status { margin-top: 15px; font-size: 14px; color: #aaa; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Kahoot Bot</h2>
+        <input type="text" id="pin" placeholder="PIN игры">
+        <input type="text" id="nickname" placeholder="Имя бота" value="Mexo_Bot">
+        <button onclick="joinGame()">Подключиться</button>
 
+        <div id="status">Статус: Готов к работе</div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        function joinGame() {
+            const pin = document.getElementById('pin').value.trim();
+            const name = document.getElementById('nickname').value.trim();
+            
+            if(!pin) return alert('Введи PIN игры!');
+            
+            document.getElementById('status').innerText = 'Статус: Подключаемся...';
+            socket.emit('join-game', { pin, name });
+        }
+
+        socket.on('status', (msg) => {
+            document.getElementById('status').innerText = 'Статус: ' + msg;
+        });
+
+        socket.on('error-msg', (msg) => {
+            document.getElementById('status').innerText = 'Ошибка: ' + msg;
+        });
+    </script>
+</body>
+</html>
