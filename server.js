@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const Kahoot = require('./kahoot.js');
+const Kahoot = require('kahoot.js-updated');
 const path = require('path');
 
 const app = express();
@@ -16,12 +16,17 @@ io.on('connection', (socket) => {
 
     socket.on('join-game', ({ pin, name }) => {
         client.join(pin, name).catch(err => {
-            socket.emit('error-msg', 'Ошибка входа: ' + (err.description || 'Неверный PIN'));
+            const errorText = typeof err === 'string' ? err : (err.description || err.message || 'Неверный PIN');
+            socket.emit('error-msg', 'Ошибка входа: ' + errorText);
         });
     });
 
     client.on("joined", () => {
         socket.emit('status', 'Успешно вошли в лобби!');
+    });
+
+    client.on("QuizStart", () => {
+        socket.emit('status', 'Викторина началась!');
     });
 
     socket.on('toggle-auto', (state) => {
@@ -40,6 +45,10 @@ io.on('connection', (socket) => {
                 socket.emit('status', 'ИИ автоматически отправил ответ!');
             }, 1000);
         }
+    });
+
+    client.on("QuizEnd", () => {
+        socket.emit('status', 'Викторина завершена.');
     });
 
     socket.on('manual-answer', (index) => {
