@@ -9,6 +9,7 @@ class Kahoot extends EventEmitter {
         this.ackCount = 0;
         this.pin = null;
         this.name = null;
+        this.pingInterval = null;
     }
 
     async join(pin, name) {
@@ -34,14 +35,11 @@ class Kahoot extends EventEmitter {
     solveChallenge(challenge) {
         if (!challenge) return '';
         try {
-            // Очищаем токен от лишних символов и сплитим фрагменты URL
             const clean = challenge.replace(/(\t|\r|\n|\s)/g, '');
             const match = clean.match(/decode\.call\(this,\s*'([^']+)'\)/);
             if (!match) return '';
             
-            // Фикс ошибки URL fragment: вырезаем выражение offset без вызова eval по всему коду
             const offsetExpr = clean.split('var offset =')[1].split(';')[0];
-            // Безопасно считаем только математику:
             const offset = Function(`"use strict"; return (${offsetExpr})`)();
             const chars = match[1];
             let decoded = '';
@@ -67,6 +65,7 @@ class Kahoot extends EventEmitter {
         this.ws = new WebSocket(`wss://kahoot.it/cometd/${this.pin}/${token}`);
 
         this.ws.on('open', () => {
+            // Handshake
             this.send([{
                 channel: '/meta/handshake',
                 version: '1.0',
@@ -85,6 +84,7 @@ class Kahoot extends EventEmitter {
         });
 
         this.ws.on('error', (err) => this.emit('error', err));
+        this.ws.on('close', () => this.stopKeepAlive());
     }
 
     send(packet) {
@@ -93,16 +93,34 @@ class Kahoot extends EventEmitter {
         }
     }
 
-    handlePacket(packet) {
-        if (packet.channel === '/meta/handshake' && packet.successful) {
-            this.clientId = packet.clientId;
+    startKeepAlive() {
+        this.stopKeepAlive();
+        // Отправляем пинг каждые 10 секунд
+        this.pingInterval = setInterval(() => {
             this.send([{
                 channel: '/meta/connect',
                 clientId: this.clientId,
                 connectionType: 'websocket',
                 id: ++this.ackCount
             }]);
+        }, 10000);
+    }
 
+    stopKeepAlive() {
+        if (this.pingInterval) {
+            clearInterval(this.pingInterval);
+            this.pingInterval = null;
+        }
+    }
+
+    handlePacket(packet) {
+        if (packet.channel === '/meta/handshake' && packet.successful) {
+            this.clientId = packet.clientId;
+            
+            // Запускаем перманентный ping/pong
+            this.startKeepAlive();
+
+            // Авторизуем имя бота
             this.send([{
                 channel: '/service/controller',
                 clientId: this.clientId,
@@ -124,6 +142,7 @@ class Kahoot extends EventEmitter {
     }
 
     leave() {
+        this.stopKeepAlive();
         if (this.ws) this.ws.close();
     }
 }
