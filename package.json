@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "postinstall": "cd node_modules/kahoot.js-updated && npx tsc",
+    "postinstall": "cd node_modules/kahoot.js-updated && npm install && node build.js",
     "start": "node server.js"
   },
   "engines": {
@@ -12,7 +12,6 @@
   "dependencies": {
     "express": "^4.19.2",
     "kahoot.js-updated": "github:theusaf/kahoot.js-updated",
-    "socket.io": "^4.7.5",
-    "typescript": "^5.0.0"
+    "socket.io": "^4.7.5"
   }
 }
