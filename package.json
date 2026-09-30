@@ -1,0 +1,14 @@
+{
+  "name": "kahoot-web-client",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "express": "^4.19.2",
+    "kahoot.js-updated": "^3.3.0",
+    "socket.io": "^4.7.5"
+  }
+}
