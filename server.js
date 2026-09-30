@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const Kahoot = require('kahoot-api');
+const Kahoot = require('kahoot.js-updated');
 const path = require('path');
 
 const app = express();
