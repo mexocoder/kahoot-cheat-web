@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const Kahoot = require('kahoot.js-updated');
+const Kahoot = require('kahoot.js-updated2');
 const path = require('path');
 
 const app = express();
@@ -34,7 +34,7 @@ io.on('connection', (socket) => {
             choicesCount: question.quizQuestionAnswers[question.gameBlockIndex] || 4
         });
 
-        // Если авто-режим включен — выбираем вариант (например, случайный или логику ИИ)
+        // Если авто-режим включен — выбираем вариант (например, первый вариант)
         if (autoSolve) {
             setTimeout(() => {
                 question.answer(0); // Отвечает на 1-й вариант (Красный)
