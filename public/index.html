@@ -3,50 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kahoot Cheat Web</title>
+    <title>Тайны Галактики</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #1e1e1e; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 320px; text-align: center; }
-        h2 { margin-top: 0; color: #4caf50; }
-        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: none; box-sizing: border-box; font-size: 14px; }
-        input { background: #2a2a2a; color: white; outline: none; }
-        input:focus { border: 1px solid #4caf50; }
-        button { background: #4caf50; color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #45a049; }
-        #status { margin-top: 15px; font-size: 14px; color: #aaa; word-wrap: break-word; }
+        :root {
+            --bg-color: #8c82ca;
+            --card-bg: #9b91d8;
+            --accent-card: #6d62a8;
+            --text-dark: #2d2557;
+            --text-light: #f1effd;
+            --shadow-soft: 8px 8px 16px #776eb0, -8px -8px 16px #a196e4;
+            --shadow-inset: inset 4px 4px 8px #776eb0, inset -4px -4px 8px #a196e4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            padding: 30px 15px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Поисковая строка */
+        .search-bar {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-inset);
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--text-light);
+            font-size: 15px;
+            width: 100%;
+        }
+
+        .search-bar input::placeholder {
+            color: #d1cbfa;
+        }
+
+        /* Главная карточка */
+        .hero-card {
+            background: var(--card-bg);
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+        }
+
+        .title-group h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 42px;
+            text-transform: uppercase;
+            color: var(--text-dark);
+            line-height: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .title-group h1 span {
+            color: #433978;
+            display: block;
+            font-size: 32px;
+        }
+
+        .info-box {
+            background: var(--accent-card);
+            border-radius: 20px;
+            padding: 18px;
+            color: var(--text-light);
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 20px;
+        }
+
+        .info-box h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 16px;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .info-box p {
+            font-size: 13px;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 22px;
+            border-radius: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            background: var(--card-bg);
+            color: var(--text-dark);
+            box-shadow: var(--shadow-soft);
+            transition: 0.2s ease;
+        }
+
+        .btn:active {
+            box-shadow: var(--shadow-inset);
+        }
+
+        /* Навигация */
+        .nav-bar {
+            display: flex;
+            justify-content: space-around;
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            margin-top: 10px;
+        }
+
+        .nav-item {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-dark);
+            box-shadow: var(--shadow-soft);
+            cursor: pointer;
+        }
+
+        /* Блок с пояснениями */
+        .details-card {
+            background: var(--card-bg);
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-bubble {
+            background: #a89ee3;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: var(--shadow-inset);
+            font-size: 13px;
+            line-height: 1.4;
+            color: var(--text-dark);
+        }
+
+        .scroll-down {
+            align-self: center;
+            background: var(--card-bg);
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            text-align: center;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Галерея */
+        .grid-gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .grid-item {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            height: 120px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .grid-item.large {
+            grid-column: span 1;
+            grid-row: span 2;
+            height: 255px;
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .grid-item .arrow-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>Kahoot Bot</h2>
-        <input type="text" id="pin" placeholder="PIN игры">
-        <input type="text" id="nickname" placeholder="Имя бота" value="Mexo_Bot">
-        <button onclick="joinGame()">Подключиться</button>
 
-        <div id="status">Статус: Готов к работе</div>
+<div class="container">
+
+    <!-- Поиск -->
+    <div class="search-bar">
+        <i class="fa-solid fa-magnifying-glass" style="color: #d1cbfa;"></i>
+        <input type="text" placeholder="Что такое галактика?">
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
+    <!-- Главная секция -->
+    <div class="hero-card">
+        <div class="title-group">
+            <h1>О<span>Галактике</span></h1>
+        </div>
 
-        function joinGame() {
-            const pin = document.getElementById('pin').value.trim();
-            const name = document.getElementById('nickname').value.trim();
-            
-            if(!pin) return alert('Введи PIN игры!');
-            
-            document.getElementById('status').innerText = 'Статус: Подключаемся...';
-            socket.emit('join-game', { pin, name });
-        }
+        <div class="info-box">
+            <h3>ГАЛАКТИКА ЭТО ...</h3>
+            <p>Гигантская система из звезд, газа и пыли, удерживаемая гравитацией. Наша галактика называется Млечный Путь!</p>
+        </div>
 
-        socket.on('status', (msg) => {
-            document.getElementById('status').innerText = 'Статус: ' + msg;
-        });
+        <div class="btn-group">
+            <button class="btn">Войти</button>
+            <button class="btn">Создать</button>
+        </div>
 
-        socket.on('error-msg', (msg) => {
-            document.getElementById('status').innerText = 'Ошибка: ' + msg;
-        });
-    </script>
+        <div class="nav-bar">
+            <div class="nav-item"><i class="fa-solid fa-house"></i></div>
+            <div class="nav-item"><i class="fa-solid fa-shapes"></i></div>
+            <div class="nav-item"><i class="fa-solid fa-gear"></i></div>
+            <div class="nav-item"><i class="fa-solid fa-user"></i></div>
+        </div>
+    </div>
+
+    <!-- Вторая секция -->
+    <div class="details-card">
+        <div class="chat-bubble">
+            Галактики объединяются в огромные скопления. Они постоянно взаимодействуют и даже могут сталкиваться друг с другом!
+        </div>
+
+        <div class="scroll-down">
+            ЛИСТАЙ НИЖЕ <i class="fa-solid fa-arrow-down" style="margin-left: 5px;"></i>
+        </div>
+    </div>
+
+    <!-- Сетка картинок -->
+    <div class="grid-gallery">
+        <div class="grid-item">
+            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=500" alt="Черная дыра">
+            <div class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+        <div class="grid-item">
+            <img src="https://images.unsplash.com/photo-1543722530-d2c3201371e7?w=500" alt="Млечный путь">
+            <div class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+        <div class="grid-item">
+            <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=500" alt="Луна">
+            <div class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+        <div class="grid-item large">
+            <img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=500" alt="Туманность">
+            <div class="arrow-btn"><i class="fa-solid fa-plus"></i></div>
+        </div>
+    </div>
+
+</div>
+
 </body>
 </html>
