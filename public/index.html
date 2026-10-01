@@ -22,6 +22,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Nunito', sans-serif;
+            user-select: none;
         }
 
         body {
@@ -35,7 +36,6 @@
             min-height: 100vh;
         }
 
-        /* Живой фон с космическим градиентом и звездами */
         .space-bg-container {
             position: fixed;
             top: 0;
@@ -65,7 +65,7 @@
             z-index: 1;
         }
 
-        /* Поисковая строка */
+        /* Поиск */
         .search-bar {
             background: var(--card-bg);
             border-radius: 25px;
@@ -99,7 +99,6 @@
             position: relative;
         }
 
-        /* 3D Планета */
         .floating-planet {
             position: absolute;
             top: -20px;
@@ -137,6 +136,8 @@
             color: var(--text-light);
             box-shadow: var(--shadow-soft);
             margin-bottom: 22px;
+            min-height: 120px;
+            transition: opacity 0.3s ease;
         }
 
         .info-box h3 {
@@ -175,6 +176,7 @@
 
         .btn:active {
             box-shadow: var(--shadow-inset);
+            transform: scale(0.97);
         }
 
         /* Навигация */
@@ -199,11 +201,13 @@
             background: var(--card-bg);
             box-shadow: var(--shadow-soft);
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .nav-item.active {
             color: #fff;
             background: var(--accent-card);
+            box-shadow: var(--shadow-inset);
         }
 
         /* Детали */
@@ -240,6 +244,11 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .scroll-down:active {
+            box-shadow: var(--shadow-inset);
         }
 
         /* Галерея */
@@ -255,6 +264,12 @@
             overflow: hidden;
             height: 135px;
             box-shadow: var(--shadow-soft);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .grid-item:active {
+            transform: scale(0.96);
         }
 
         .grid-item img {
@@ -277,7 +292,78 @@
             justify-content: center;
             color: white;
             font-size: 13px;
+        }
+
+        /* Всплывающие модальные окна */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(35, 28, 66, 0.7);
+            backdrop-filter: blur(6px);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-body {
+            background: var(--card-bg);
+            border-radius: 30px;
+            padding: 25px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+        }
+
+        .modal-body h2 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--text-dark);
+            font-size: 22px;
+        }
+
+        .modal-body input {
+            width: 100%;
+            padding: 12px 18px;
+            border-radius: 15px;
+            border: none;
+            background: var(--card-bg);
+            box-shadow: var(--shadow-inset);
+            color: var(--text-light);
+            outline: none;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 18px;
+            font-size: 20px;
             cursor: pointer;
+            color: var(--text-dark);
+        }
+
+        /* Просмотрщик картинок */
+        .lightbox-img {
+            max-width: 90vw;
+            max-height: 80vh;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
         }
     </style>
 </head>
@@ -291,7 +377,7 @@
     <!-- Поиск -->
     <div class="search-bar">
         <i class="fa-solid fa-magnifying-glass" style="color: #e2dcff;"></i>
-        <input type="text" placeholder="Что такое галактика?">
+        <input type="text" id="searchInput" placeholder="Поиск по сайту...">
     </div>
 
     <!-- Главная секция -->
@@ -299,53 +385,54 @@
         <div class="floating-planet">🪐</div>
 
         <div class="title-group">
-            <h1>О<span>Галактике</span></h1>
+            <h1 id="tabTitle">О<span>Галактике</span></h1>
         </div>
 
-        <div class="info-box">
+        <div class="info-box" id="infoBox">
             <h3>ГАЛАКТИКА ЭТО ...</h3>
             <p>Гигантская система из миллиардов звёзд, пыли и тёмной материи. Наш дом — спиральная галактика Млечный Путь!</p>
         </div>
 
         <div class="btn-group">
-            <button class="btn">Войти</button>
-            <button class="btn">Создать</button>
+            <button class="btn" id="loginBtn">Войти</button>
+            <button class="btn" id="createBtn">Создать</button>
         </div>
 
+        <!-- Навигация -->
         <div class="nav-bar">
-            <div class="nav-item active"><i class="fa-solid fa-house"></i></div>
-            <div class="nav-item"><i class="fa-solid fa-shapes"></i></div>
-            <div class="nav-item"><i class="fa-solid fa-gear"></i></div>
-            <div class="nav-item"><i class="fa-solid fa-user"></i></div>
+            <div class="nav-item active" data-tab="home"><i class="fa-solid fa-house"></i></div>
+            <div class="nav-item" data-tab="shapes"><i class="fa-solid fa-shapes"></i></div>
+            <div class="nav-item" data-tab="settings"><i class="fa-solid fa-gear"></i></div>
+            <div class="nav-item" data-tab="user"><i class="fa-solid fa-user"></i></div>
         </div>
     </div>
 
     <!-- Детали -->
     <div class="details-card">
-        <div class="chat-bubble">
+        <div class="chat-bubble" id="factBox">
             ✨ Знаешь ли ты? В видимой Вселенной насчитывается более 2 триллионов галактик!
         </div>
 
-        <div class="scroll-down">
+        <div class="scroll-down" id="scrollBtn">
             ЛИСТАЙ НИЖЕ <i class="fa-solid fa-arrow-down"></i>
         </div>
     </div>
 
     <!-- Галерея -->
-    <div class="grid-gallery">
-        <div class="grid-item">
+    <div class="grid-gallery" id="gallery">
+        <div class="grid-item" data-title="Черная дыра">
             <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=500" alt="Черная дыра">
             <div class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></div>
         </div>
-        <div class="grid-item">
+        <div class="grid-item" data-title="Млечный путь">
             <img src="https://images.unsplash.com/photo-1543722530-d2c3201371e7?w=500" alt="Млечный путь">
             <div class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></div>
         </div>
-        <div class="grid-item">
+        <div class="grid-item" data-title="Марс">
             <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=500" alt="Марс">
             <div class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></div>
         </div>
-        <div class="grid-item">
+        <div class="grid-item" data-title="Туманность">
             <img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=500" alt="Туманность">
             <div class="arrow-btn"><i class="fa-solid fa-plus"></i></div>
         </div>
@@ -353,8 +440,25 @@
 
 </div>
 
+<!-- Модалка авторизации -->
+<div class="modal-overlay" id="authModal">
+    <div class="modal-body">
+        <span class="modal-close" class="closeModal">&times;</span>
+        <h2 id="modalTitle">Вход</h2>
+        <input type="text" placeholder="Логин">
+        <input type="password" placeholder="Пароль">
+        <button class="btn" id="modalSubmit">Подтвердить</button>
+    </div>
+</div>
+
+<!-- Модалка просмотра фото -->
+<div class="modal-overlay" id="imageModal">
+    <span class="modal-close" style="color: white; font-size: 35px; top: 20px; right: 25px;">&times;</span>
+    <img src="" alt="Просмотр" class="lightbox-img" id="lightboxImg">
+</div>
+
 <script>
-    // Мерцающий анимированный звездный фон
+    // 1. Анимированный звездный фон
     const canvas = document.getElementById('stars-canvas');
     const ctx = canvas.getContext('2d');
 
@@ -386,6 +490,112 @@
         requestAnimationFrame(animate);
     }
     animate();
+
+    // 2. Переключение вкладок
+    const tabData = {
+        home: {
+            title: 'О<span>Галактике</span>',
+            header: 'ГАЛАКТИКА ЭТО ...',
+            text: 'Гигантская система из миллиардов звёзд, пыли и тёмной материи. Наш дом — спиральная галактика Млечный Путь!'
+        },
+        shapes: {
+            title: 'Типы<span>Галактик</span>',
+            header: 'ФОРМЫ И ВИДЫ',
+            text: 'Галактики бывают Спиральными, Эллиптическими, Линзовидными и Неправильными. Каждая имеет уникальное строение!'
+        },
+        settings: {
+            title: 'Настройки<span>Сайта</span>',
+            header: 'ПАРАМЕТРЫ',
+            text: 'Здесь можно настроить отображение анимаций, звуковые эффекты космического пространства и тему.'
+        },
+        user: {
+            title: 'Профиль<span>Исследователя</span>',
+            header: 'ЛИЧНЫЙ КАБИНЕТ',
+            text: 'Войдите в аккаунт, чтобы сохранять понравившиеся снимки космоса и создавать свои коллекции.'
+        }
+    };
+
+    const navItems = document.querySelectorAll('.nav-item');
+    const tabTitle = document.getElementById('tabTitle');
+    const infoBox = document.getElementById('infoBox');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            navItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            const tabKey = item.dataset.tab;
+            const data = tabData[tabKey];
+
+            infoBox.style.opacity = 0;
+            setTimeout(() => {
+                tabTitle.innerHTML = data.title;
+                infoBox.querySelector('h3').innerText = data.header;
+                infoBox.querySelector('p').innerText = data.text;
+                infoBox.style.opacity = 1;
+            }, 200);
+        });
+    });
+
+    // 3. Модальные окна (Войти / Создать)
+    const authModal = document.getElementById('authModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const loginBtn = document.getElementById('loginBtn');
+    const createBtn = document.getElementById('createBtn');
+    const closeModalButtons = document.querySelectorAll('.modal-close');
+
+    loginBtn.addEventListener('click', () => {
+        modalTitle.innerText = 'Вход';
+        authModal.classList.add('active');
+    });
+
+    createBtn.addEventListener('click', () => {
+        modalTitle.innerText = 'Регистрация';
+        authModal.classList.add('active');
+    });
+
+    closeModalButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+        });
+    });
+
+    document.getElementById('modalSubmit').addEventListener('click', () => {
+        alert('Успешно!');
+        authModal.classList.remove('active');
+    });
+
+    // 4. Просмотр картинок из галереи
+    const imageModal = document.getElementById('imageModal');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const gridItems = document.querySelectorAll('.grid-item');
+
+    gridItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const imgSrc = item.querySelector('img').src;
+            lightboxImg.src = imgSrc;
+            imageModal.classList.add('active');
+        });
+    });
+
+    // 5. Плавная прокрутка
+    document.getElementById('scrollBtn').addEventListener('click', () => {
+        document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // 6. Поиск
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        gridItems.forEach(item => {
+            const title = item.dataset.title.toLowerCase();
+            if (title.includes(query)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
 </script>
 
 </body>
