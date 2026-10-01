@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Тайны Галактики</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #8c82ca;
-            --card-bg: #9b91d8;
-            --accent-card: #6d62a8;
-            --text-dark: #2d2557;
-            --text-light: #f1effd;
-            --shadow-soft: 8px 8px 16px #776eb0, -8px -8px 16px #a196e4;
-            --shadow-inset: inset 4px 4px 8px #776eb0, inset -4px -4px 8px #a196e4;
+            --bg-color: #7b71be;
+            --card-bg: #8d83d1;
+            --accent-card: #5a5099;
+            --text-dark: #231c42;
+            --text-light: #f3f0ff;
+            --shadow-soft: 8px 8px 20px #675ea1, -8px -8px 20px #a398ff;
+            --shadow-inset: inset 4px 4px 10px #675ea1, inset -4px -4px 10px #a398ff;
+            --glow: 0 0 15px rgba(255, 255, 255, 0.6);
         }
 
         * {
@@ -29,26 +30,45 @@
             color: var(--text-dark);
             display: flex;
             justify-content: center;
-            padding: 30px 15px;
+            padding: 25px 15px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Анимированный фон со звездами */
+        #space-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
         }
 
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 440px;
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 22px;
+            z-index: 1;
         }
 
         /* Поисковая строка */
         .search-bar {
             background: var(--card-bg);
-            border-radius: 20px;
-            padding: 12px 20px;
+            border-radius: 25px;
+            padding: 14px 22px;
             display: flex;
             align-items: center;
             gap: 12px;
             box-shadow: var(--shadow-inset);
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus-within {
+            box-shadow: var(--shadow-inset), var(--glow);
         }
 
         .search-bar input {
@@ -57,6 +77,7 @@
             background: transparent;
             color: var(--text-light);
             font-size: 15px;
+            font-weight: 700;
             width: 100%;
         }
 
@@ -67,67 +88,96 @@
         /* Главная карточка */
         .hero-card {
             background: var(--card-bg);
-            border-radius: 30px;
-            padding: 25px;
+            border-radius: 35px;
+            padding: 28px;
             box-shadow: var(--shadow-soft);
             position: relative;
         }
 
+        /* 3D Астронавт с парением */
+        .floating-astro {
+            position: absolute;
+            top: -35px;
+            right: -10px;
+            width: 110px;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+            animation: float 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(5deg); }
+        }
+
         .title-group h1 {
             font-family: 'Fredoka', sans-serif;
-            font-size: 42px;
+            font-size: 38px;
             text-transform: uppercase;
             color: var(--text-dark);
-            line-height: 0.9;
-            margin-bottom: 15px;
+            line-height: 1;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
         }
 
         .title-group h1 span {
-            color: #433978;
+            color: #382e66;
             display: block;
-            font-size: 32px;
+            font-size: 28px;
         }
 
         .info-box {
             background: var(--accent-card);
-            border-radius: 20px;
-            padding: 18px;
+            border-radius: 22px;
+            padding: 20px;
             color: var(--text-light);
             box-shadow: var(--shadow-soft);
-            margin-bottom: 20px;
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
         }
 
         .info-box h3 {
             font-family: 'Fredoka', sans-serif;
-            font-size: 16px;
-            margin-bottom: 6px;
-            letter-spacing: 0.5px;
+            font-size: 17px;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            color: #ffd66b;
         }
 
         .info-box p {
-            font-size: 13px;
-            line-height: 1.4;
-            opacity: 0.9;
+            font-size: 13.5px;
+            line-height: 1.5;
+            opacity: 0.95;
         }
 
         .btn-group {
             display: flex;
-            gap: 12px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         .btn {
             border: none;
-            padding: 10px 22px;
-            border-radius: 15px;
+            padding: 12px 24px;
+            border-radius: 18px;
             font-weight: 800;
+            font-size: 14px;
             cursor: pointer;
             background: var(--card-bg);
             color: var(--text-dark);
             box-shadow: var(--shadow-soft);
-            transition: 0.2s ease;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 10px 10px 22px #675ea1, -10px -10px 22px #a398ff;
         }
 
         .btn:active {
+            transform: translateY(0);
             box-shadow: var(--shadow-inset);
         }
 
@@ -136,77 +186,97 @@
             display: flex;
             justify-content: space-around;
             background: var(--card-bg);
-            padding: 12px;
-            border-radius: 20px;
-            box-shadow: var(--shadow-soft);
-            margin-top: 10px;
+            padding: 10px;
+            border-radius: 22px;
+            box-shadow: var(--shadow-inset);
         }
 
         .nav-item {
-            width: 45px;
-            height: 45px;
-            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 19px;
             color: var(--text-dark);
+            background: var(--card-bg);
             box-shadow: var(--shadow-soft);
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        /* Блок с пояснениями */
+        .nav-item:hover, .nav-item.active {
+            color: #fff;
+            background: var(--accent-card);
+            box-shadow: var(--glow);
+        }
+
+        /* Инфо-блок 2 */
         .details-card {
             background: var(--card-bg);
-            border-radius: 30px;
+            border-radius: 35px;
             padding: 25px;
             box-shadow: var(--shadow-soft);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 18px;
+            position: relative;
         }
 
         .chat-bubble {
-            background: #a89ee3;
-            border-radius: 20px;
-            padding: 15px;
+            background: #988ee0;
+            border-radius: 22px;
+            padding: 18px;
             box-shadow: var(--shadow-inset);
-            font-size: 13px;
-            line-height: 1.4;
+            font-size: 14px;
+            line-height: 1.5;
             color: var(--text-dark);
+            font-weight: 600;
         }
 
         .scroll-down {
             align-self: center;
             background: var(--card-bg);
-            padding: 10px 20px;
+            padding: 12px 25px;
             border-radius: 20px;
             box-shadow: var(--shadow-soft);
-            text-align: center;
-            font-weight: 700;
-            font-size: 12px;
+            font-weight: 800;
+            font-size: 13px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .scroll-down i {
+            animation: bounce 1.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
         }
 
         /* Галерея */
         .grid-gallery {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            gap: 16px;
         }
 
         .grid-item {
             position: relative;
-            border-radius: 20px;
+            border-radius: 24px;
             overflow: hidden;
-            height: 120px;
+            height: 135px;
             box-shadow: var(--shadow-soft);
+            transition: transform 0.3s ease;
         }
 
-        .grid-item.large {
-            grid-column: span 1;
-            grid-row: span 2;
-            height: 255px;
+        .grid-item:hover {
+            transform: scale(1.03);
         }
 
         .grid-item img {
@@ -217,41 +287,47 @@
 
         .grid-item .arrow-btn {
             position: absolute;
-            bottom: 10px;
-            right: 10px;
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(5px);
-            border-radius: 10px;
+            bottom: 12px;
+            right: 12px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 12px;
+            font-size: 13px;
             cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
     </style>
 </head>
 <body>
 
+<canvas id="space-bg"></canvas>
+
 <div class="container">
 
     <!-- Поиск -->
     <div class="search-bar">
-        <i class="fa-solid fa-magnifying-glass" style="color: #d1cbfa;"></i>
+        <i class="fa-solid fa-magnifying-glass" style="color: #e2dcff;"></i>
         <input type="text" placeholder="Что такое галактика?">
     </div>
 
     <!-- Главная секция -->
     <div class="hero-card">
+        <!-- 3D PNG космонавт -->
+        <img class="floating-astro" src="https://cdni.iconscout.com/illustration/premium/thumb/astronaut-floating-in-space-4540209-3784131.png" alt="Astronaut">
+
         <div class="title-group">
             <h1>О<span>Галактике</span></h1>
         </div>
 
         <div class="info-box">
             <h3>ГАЛАКТИКА ЭТО ...</h3>
-            <p>Гигантская система из звезд, газа и пыли, удерживаемая гравитацией. Наша галактика называется Млечный Путь!</p>
+            <p>Гигантская система из миллиардов звёзд, пыли и тёмной материи. Наш дом — спиральная галактика Млечный Путь!</p>
         </div>
 
         <div class="btn-group">
@@ -260,25 +336,25 @@
         </div>
 
         <div class="nav-bar">
-            <div class="nav-item"><i class="fa-solid fa-house"></i></div>
+            <div class="nav-item active"><i class="fa-solid fa-house"></i></div>
             <div class="nav-item"><i class="fa-solid fa-shapes"></i></div>
             <div class="nav-item"><i class="fa-solid fa-gear"></i></div>
             <div class="nav-item"><i class="fa-solid fa-user"></i></div>
         </div>
     </div>
 
-    <!-- Вторая секция -->
+    <!-- Детали -->
     <div class="details-card">
         <div class="chat-bubble">
-            Галактики объединяются в огромные скопления. Они постоянно взаимодействуют и даже могут сталкиваться друг с другом!
+            ✨ Знаешь ли ты? В видимой Вселенной насчитывается более 2 триллионов галактик!
         </div>
 
         <div class="scroll-down">
-            ЛИСТАЙ НИЖЕ <i class="fa-solid fa-arrow-down" style="margin-left: 5px;"></i>
+            ЛИСТАЙ НИЖЕ <i class="fa-solid fa-arrow-down"></i>
         </div>
     </div>
 
-    <!-- Сетка картинок -->
+    <!-- Галерея -->
     <div class="grid-gallery">
         <div class="grid-item">
             <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=500" alt="Черная дыра">
@@ -289,16 +365,52 @@
             <div class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></div>
         </div>
         <div class="grid-item">
-            <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=500" alt="Луна">
+            <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=500" alt="Марс">
             <div class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></div>
         </div>
-        <div class="grid-item large">
+        <div class="grid-item">
             <img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=500" alt="Туманность">
             <div class="arrow-btn"><i class="fa-solid fa-plus"></i></div>
         </div>
     </div>
 
 </div>
+
+<script>
+    // Генерация динамического фона со звездами
+    const canvas = document.getElementById('space-bg');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const stars = Array.from({ length: 60 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 2,
+        alpha: Math.random(),
+        speed: Math.random() * 0.02 + 0.005
+    }));
+
+    function drawStars() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(star => {
+            star.alpha += star.speed;
+            if (star.alpha > 1 || star.alpha < 0) star.speed = -star.speed;
+
+            ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(star.alpha)})`;
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        requestAnimationFrame(drawStars);
+    }
+    drawStars();
+</script>
 
 </body>
 </html>
