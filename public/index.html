@@ -8,14 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            /* Полупрозрачная палитра под гифку */
-            --card-bg: rgba(141, 131, 209, 0.45);
-            --accent-card: rgba(90, 80, 153, 0.65);
-            --text-dark: #1e173b;
-            --text-light: #ffffff;
-            --shadow-soft: 8px 8px 20px rgba(0, 0, 0, 0.25), -6px -6px 15px rgba(255, 255, 255, 0.15);
-            --shadow-inset: inset 4px 4px 10px rgba(0, 0, 0, 0.3), inset -4px -4px 10px rgba(255, 255, 255, 0.15);
-            --glow: 0 0 15px rgba(255, 255, 255, 0.5);
+            --bg-color: #7b71be;
+            --card-bg: #8d83d1;
+            --accent-card: #5a5099;
+            --text-dark: #231c42;
+            --text-light: #f3f0ff;
+            --shadow-soft: 8px 8px 20px #675ea1, -8px -8px 20px #a398ff;
+            --shadow-inset: inset 4px 4px 10px #675ea1, inset -4px -4px 10px #a398ff;
         }
 
         * {
@@ -26,37 +25,35 @@
         }
 
         body {
-            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
             display: flex;
             justify-content: center;
             padding: 25px 15px;
             overflow-x: hidden;
             position: relative;
-            color: var(--text-dark);
+            min-height: 100vh;
         }
 
-        /* Анимированный GIF-фон */
-        .bg-gif {
+        /* Живой фон с космическим градиентом и звездами */
+        .space-bg-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            /* Космическая гифка высочайшего качества */
-            background: url('https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3ZydnA0ZXlyd2Iwbnp1ZjBqMWlzaXRvNWFjMmFubHN3OHB6N2h5eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/U3qYN8S0AY3za/giphy.gif') center/cover no-repeat;
+            background: radial-gradient(circle at 50% 20%, #8b80d0 0%, #685ca8 100%);
             z-index: -2;
         }
 
-        /* Фиолетовый темный фильтр поверх гифки */
-        .bg-overlay {
+        #stars-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(45, 35, 85, 0.55);
-            backdrop-filter: blur(4px);
             z-index: -1;
+            pointer-events: none;
         }
 
         .container {
@@ -71,8 +68,6 @@
         /* Поисковая строка */
         .search-bar {
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 25px;
             padding: 14px 22px;
             display: flex;
@@ -92,56 +87,51 @@
         }
 
         .search-bar input::placeholder {
-            color: #e2dcff;
+            color: #d1cbfa;
         }
 
         /* Главная карточка */
         .hero-card {
             background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 35px;
             padding: 28px;
             box-shadow: var(--shadow-soft);
             position: relative;
         }
 
-        /* CSS 3D Сатурн вместо ломающихся картинок */
+        /* 3D Планета */
         .floating-planet {
             position: absolute;
-            top: -25px;
-            right: 10px;
-            font-size: 65px;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+            top: -20px;
+            right: 15px;
+            font-size: 60px;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.25));
             animation: float 4s ease-in-out infinite;
             pointer-events: none;
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-12px) rotate(8deg); }
+            50% { transform: translateY(-10px) rotate(6deg); }
         }
 
         .title-group h1 {
             font-family: 'Fredoka', sans-serif;
             font-size: 38px;
             text-transform: uppercase;
-            color: var(--text-light);
-            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            color: var(--text-dark);
             line-height: 1;
             margin-bottom: 20px;
         }
 
         .title-group h1 span {
-            color: #ffd66b;
+            color: #382e66;
             display: block;
             font-size: 28px;
         }
 
         .info-box {
             background: var(--accent-card);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 22px;
             padding: 20px;
             color: var(--text-light);
@@ -170,27 +160,20 @@
         }
 
         .btn {
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: none;
             padding: 12px 24px;
             border-radius: 18px;
             font-weight: 800;
             font-size: 14px;
             cursor: pointer;
-            background: rgba(255, 255, 255, 0.2);
-            color: var(--text-light);
+            background: var(--card-bg);
+            color: var(--text-dark);
             box-shadow: var(--shadow-soft);
             transition: all 0.2s ease;
             flex: 1;
-            backdrop-filter: blur(5px);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.35);
         }
 
         .btn:active {
-            transform: translateY(0);
             box-shadow: var(--shadow-inset);
         }
 
@@ -198,7 +181,7 @@
         .nav-bar {
             display: flex;
             justify-content: space-around;
-            background: rgba(0, 0, 0, 0.25);
+            background: var(--card-bg);
             padding: 10px;
             border-radius: 22px;
             box-shadow: var(--shadow-inset);
@@ -212,24 +195,20 @@
             align-items: center;
             justify-content: center;
             font-size: 19px;
-            color: var(--text-light);
-            background: rgba(255, 255, 255, 0.15);
+            color: var(--text-dark);
+            background: var(--card-bg);
             box-shadow: var(--shadow-soft);
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
-        .nav-item:hover, .nav-item.active {
-            color: #ffd66b;
-            background: rgba(255, 255, 255, 0.3);
-            box-shadow: var(--glow);
+        .nav-item.active {
+            color: #fff;
+            background: var(--accent-card);
         }
 
         /* Детали */
         .details-card {
             background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 35px;
             padding: 25px;
             box-shadow: var(--shadow-soft);
@@ -239,26 +218,24 @@
         }
 
         .chat-bubble {
-            background: rgba(0, 0, 0, 0.25);
+            background: #988ee0;
             border-radius: 22px;
             padding: 18px;
             box-shadow: var(--shadow-inset);
             font-size: 14px;
             line-height: 1.5;
-            color: var(--text-light);
+            color: var(--text-dark);
             font-weight: 600;
         }
 
         .scroll-down {
             align-self: center;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: var(--card-bg);
             padding: 12px 25px;
             border-radius: 20px;
             box-shadow: var(--shadow-soft);
             font-weight: 800;
             font-size: 13px;
-            color: var(--text-light);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -278,7 +255,6 @@
             overflow: hidden;
             height: 135px;
             box-shadow: var(--shadow-soft);
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .grid-item img {
@@ -293,7 +269,7 @@
             right: 12px;
             width: 36px;
             height: 36px;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(8px);
             border-radius: 12px;
             display: flex;
@@ -302,20 +278,19 @@
             color: white;
             font-size: 13px;
             cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
 <body>
 
-<div class="bg-gif"></div>
-<div class="bg-overlay"></div>
+<div class="space-bg-container"></div>
+<canvas id="stars-canvas"></canvas>
 
 <div class="container">
 
     <!-- Поиск -->
     <div class="search-bar">
-        <i class="fa-solid fa-magnifying-glass" style="color: #ffd66b;"></i>
+        <i class="fa-solid fa-magnifying-glass" style="color: #e2dcff;"></i>
         <input type="text" placeholder="Что такое галактика?">
     </div>
 
@@ -377,6 +352,41 @@
     </div>
 
 </div>
+
+<script>
+    // Мерцающий анимированный звездный фон
+    const canvas = document.getElementById('stars-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const stars = Array.from({ length: 70 }, () => ({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        size: Math.random() * 2 + 0.5,
+        alpha: Math.random(),
+        speed: Math.random() * 0.02 + 0.005
+    }));
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(s => {
+            s.alpha += s.speed;
+            if (s.alpha > 1 || s.alpha < 0) s.speed = -s.speed;
+            ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(s.alpha)})`;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        requestAnimationFrame(animate);
+    }
+    animate();
+</script>
 
 </body>
 </html>
