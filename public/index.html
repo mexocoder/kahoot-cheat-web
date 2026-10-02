@@ -251,6 +251,39 @@
             box-shadow: var(--shadow-inset);
         }
 
+        /* Фильтры галереи */
+        .gallery-filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: none;
+        }
+
+        .gallery-filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-btn {
+            background: var(--card-bg);
+            box-shadow: var(--shadow-soft);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-dark);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--accent-card);
+            color: var(--text-light);
+            box-shadow: var(--shadow-inset);
+        }
+
         /* Галерея */
         .grid-gallery {
             display: grid;
@@ -262,10 +295,10 @@
             position: relative;
             border-radius: 24px;
             overflow: hidden;
-            height: 135px;
+            height: 140px;
             box-shadow: var(--shadow-soft);
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease, opacity 0.3s ease;
         }
 
         .grid-item:active {
@@ -278,20 +311,32 @@
             object-fit: cover;
         }
 
+        .grid-item .item-title {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 25px 12px 10px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
         .grid-item .arrow-btn {
             position: absolute;
-            bottom: 12px;
-            right: 12px;
-            width: 36px;
-            height: 36px;
+            top: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
             background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(8px);
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         /* Всплывающие модальные окна */
@@ -301,8 +346,8 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(35, 28, 66, 0.7);
-            backdrop-filter: blur(6px);
+            background: rgba(35, 28, 66, 0.75);
+            backdrop-filter: blur(8px);
             z-index: 10;
             display: flex;
             align-items: center;
@@ -358,7 +403,6 @@
             color: var(--text-dark);
         }
 
-        /* Просмотрщик картинок */
         .lightbox-img {
             max-width: 90vw;
             max-height: 80vh;
@@ -377,7 +421,7 @@
     <!-- Поиск -->
     <div class="search-bar">
         <i class="fa-solid fa-magnifying-glass" style="color: #e2dcff;"></i>
-        <input type="text" id="searchInput" placeholder="Поиск по сайту...">
+        <input type="text" id="searchInput" placeholder="Поиск объектов...">
     </div>
 
     <!-- Главная секция -->
@@ -418,24 +462,90 @@
         </div>
     </div>
 
-    <!-- Галерея -->
+    <!-- Фильтры категорий -->
+    <div class="gallery-filters">
+        <button class="filter-btn active" data-filter="all">Все (12)</button>
+        <button class="filter-btn" data-filter="galaxy">Галактики</button>
+        <button class="filter-btn" data-filter="nebula">Туманности</button>
+        <button class="filter-btn" data-filter="planet">Планеты</button>
+        <button class="filter-btn" data-filter="deep">Глубокий космос</button>
+    </div>
+
+    <!-- Расширенная галерея (12 фото) -->
     <div class="grid-gallery" id="gallery">
-        <div class="grid-item" data-title="Черная дыра">
-            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=500" alt="Черная дыра">
-            <div class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></div>
+
+        <div class="grid-item" data-category="galaxy" data-title="Черная дыра">
+            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=600" alt="Черная дыра">
+            <div class="item-title">Черная дыра</div>
+            <div class="arrow-btn"><i class="fa-solid fa-expand"></i></div>
         </div>
-        <div class="grid-item" data-title="Млечный путь">
-            <img src="https://images.unsplash.com/photo-1543722530-d2c3201371e7?w=500" alt="Млечный путь">
-            <div class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></div>
+
+        <div class="grid-item" data-category="galaxy" data-title="Млечный путь">
+            <img src="https://images.unsplash.com/photo-1543722530-d2c3201371e7?w=600" alt="Млечный путь">
+            <div class="item-title">Млечный путь</div>
+            <div class="arrow-btn"><i class="fa-solid fa-expand"></i></div>
         </div>
-        <div class="grid-item" data-title="Марс">
-            <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=500" alt="Марс">
-            <div class="arrow-btn"><i class="fa-solid fa-arrow-right"></i></div>
+
+        <div class="grid-item" data-category="planet" data-title="Марс">
+            <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=600" alt="Марс">
+            <div class="item-title">Марс</div>
+            <div class="arrow-btn"><i class="fa-solid fa-expand"></i></div>
         </div>
-        <div class="grid-item" data-title="Туманность">
-            <img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=500" alt="Туманность">
-            <div class="arrow-btn"><i class="fa-solid fa-plus"></i></div>
+
+        <div class="grid-item" data-category="nebula" data-title="Туманность Ориона">
+            <img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=600" alt="Туманность">
+            <div class="item-title">Туманность</div>
+            <div class="arrow-btn"><i class="fa-solid fa-expand"></i></div>
         </div>
+
+        <div class="grid-item" data-category="galaxy" data-title="Андромеда">
+            <img src="https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=600" alt="Андромеда">
+            <div class="item-title">Галактика Андромеды</div>
+            <div class="arrow-btn"><i class="fa-solid fa-expand"></i></div>
+        </div>
+
+        <div class="grid-item" data-category="planet" data-title="Сатурн и Кольца">
+            <img src="https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=600" alt="Сатурн">
+            <div class="item-title">Сатурн</div>
+            <div class="arrow-btn"><i class="fa-solid fa-expand"></i></div>
+        </div>
+
+        <div class="grid-item" data-category="nebula" data-title="Огненная туманность">
+            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600" alt="Огненная туманность">
+            <div class="item-title">Огненная туманность</div>
+            <div class="arrow-btn"><i class="fa-solid fa-expand"></i></div>
+        </div>
+
+        <div class="grid-item" data-category="deep" data-title="Столпы Творения">
+            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600" alt="Звездная пыль">
+            <div class="item-title">Космическая пыль</div>
+            <div class="arrow-btn"><i class="fa-solid fa-expand"></i></div>
+        </div>
+
+        <div class="grid-item" data-category="planet" data-title="Земля из космоса">
+            <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=600" alt="Земля">
+            <div class="item-title">Планета Земля</div>
+            <div class="arrow-btn"><i class="fa-solid fa-expand"></i></div>
+        </div>
+
+        <div class="grid-item" data-category="deep" data-title="Скопление звёзд">
+            <img src="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=600" alt="Скопление звезд">
+            <div class="item-title">Скопление звёзд</div>
+            <div class="arrow-btn"><i class="fa-solid fa-expand"></i></div>
+        </div>
+
+        <div class="grid-item" data-category="nebula" data-title="Космический взрыв">
+            <img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=600" alt="Сверхновая">
+            <div class="item-title">Сверхновая</div>
+            <div class="arrow-btn"><i class="fa-solid fa-expand"></i></div>
+        </div>
+
+        <div class="grid-item" data-category="deep" data-title="Далекая Вселенная">
+            <img src="https://images.unsplash.com/photo-1538370965046-79c0d6907d47?w=600" alt="Далекий космос">
+            <div class="item-title">Далекий космос</div>
+            <div class="arrow-btn"><i class="fa-solid fa-expand"></i></div>
+        </div>
+
     </div>
 
 </div>
@@ -443,7 +553,7 @@
 <!-- Модалка авторизации -->
 <div class="modal-overlay" id="authModal">
     <div class="modal-body">
-        <span class="modal-close" class="closeModal">&times;</span>
+        <span class="modal-close">&times;</span>
         <h2 id="modalTitle">Вход</h2>
         <input type="text" placeholder="Логин">
         <input type="password" placeholder="Пароль">
@@ -594,6 +704,24 @@
             } else {
                 item.style.display = 'none';
             }
+        });
+    });
+
+    // 7. Фильтрация по категориям
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filter = btn.dataset.filter;
+            gridItems.forEach(item => {
+                if (filter === 'all' || item.dataset.category === filter) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
         });
     });
 </script>
