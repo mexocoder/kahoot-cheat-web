@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>3D Солнечная Система</title>
     <style>
         * {
@@ -10,12 +10,13 @@
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: #020208;
             color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             overflow: hidden;
             width: 100vw;
             height: 100vh;
@@ -30,54 +31,51 @@
             z-index: 1;
         }
 
-        /* Список выбора планет */
+        /* Компактное меню планет слева */
         .planets-menu {
             position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
+            left: 12px;
+            top: 12px;
             z-index: 10;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            background: rgba(10, 15, 30, 0.65);
+            gap: 6px;
+            background: rgba(10, 15, 30, 0.75);
             backdrop-filter: blur(12px);
-            padding: 14px;
-            border-radius: 20px;
+            padding: 10px;
+            border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-            max-height: 90vh;
+            max-height: calc(100vh - 120px);
             overflow-y: auto;
+            width: 130px;
         }
 
         .planets-menu::-webkit-scrollbar {
-            width: 4px;
+            width: 3px;
         }
         .planets-menu::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
+            border-radius: 3px;
         }
 
         .menu-btn {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.08);
             color: #e2e8f0;
-            padding: 10px 16px;
-            border-radius: 12px;
-            font-size: 13px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             text-align: left;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .menu-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(5px);
-            color: #fff;
+        .menu-btn:active {
+            transform: scale(0.96);
         }
 
         .menu-btn.active {
@@ -85,100 +83,124 @@
             color: #0f172a;
             border-color: #38bdf8;
             font-weight: bold;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
         }
 
         .dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
-            display: inline-block;
+            flex-shrink: 0;
         }
 
-        /* Панель информации */
+        /* Кнопка переключения инфо-панели */
+        .toggle-info-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 11;
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #38bdf8;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        /* Панель информации (компактный адаптивный дизайн) */
         .info-panel {
             position: absolute;
-            right: 20px;
-            top: 20px;
-            width: 320px;
-            background: rgba(10, 15, 30, 0.75);
+            right: 12px;
+            bottom: 12px;
+            width: calc(100vw - 24px);
+            max-width: 340px;
+            background: rgba(10, 15, 30, 0.85);
             backdrop-filter: blur(16px);
-            border-radius: 24px;
-            padding: 24px;
+            border-radius: 20px;
+            padding: 16px;
             border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
             z-index: 10;
-            transition: all 0.4s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .info-panel.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px) scale(0.95);
+        }
+
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 10px;
         }
 
         .info-panel h2 {
-            font-size: 26px;
+            font-size: 20px;
             color: #38bdf8;
-            margin-bottom: 6px;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
         }
 
         .info-panel .subtitle {
-            font-size: 12px;
+            font-size: 11px;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-            display: block;
         }
 
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 16px;
+            gap: 6px;
+            margin-bottom: 10px;
         }
 
         .stat-card {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 10px 12px;
-            border-radius: 12px;
+            padding: 6px 8px;
+            border-radius: 10px;
         }
 
         .stat-card .label {
-            font-size: 11px;
+            font-size: 9px;
             color: #64748b;
             display: block;
-            margin-bottom: 2px;
         }
 
         .stat-card .val {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: bold;
             color: #f1f5f9;
         }
 
         .description {
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 11px;
+            line-height: 1.4;
             color: #cbd5e1;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 12px;
-            border-radius: 12px;
-            border-left: 3px solid #38bdf8;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 8px 10px;
+            border-radius: 10px;
+            border-left: 2px solid #38bdf8;
         }
 
-        /* Управление вращением системы */
-        .controls-hint {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            background: rgba(10, 15, 30, 0.6);
-            backdrop-filter: blur(8px);
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: #94a3b8;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            pointer-events: none;
+        @media (min-width: 600px) {
+            .info-panel {
+                top: 12px;
+                bottom: auto;
+                width: 300px;
+            }
+            .planets-menu {
+                width: 140px;
+            }
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -188,24 +210,29 @@
 
 <div id="webgl-container"></div>
 
+<!-- Кнопка скрыть/показать инфо -->
+<button class="toggle-info-btn" id="toggleInfo">ℹ️</button>
+
 <!-- Меню планет -->
 <div class="planets-menu" id="planetsMenu"></div>
 
-<!-- Карточка информации -->
+<!-- Панель информации -->
 <div class="info-panel" id="infoPanel">
-    <h2 id="pName">Солнечная Система</h2>
-    <span class="subtitle" id="pType">Звездная система</span>
+    <div class="info-header">
+        <h2 id="pName">Солнце</h2>
+        <span class="subtitle" id="pType">Звезда</span>
+    </div>
     <div class="info-grid">
         <div class="stat-card">
             <span class="label">Температура</span>
-            <span class="val" id="pTemp">~5500 °C</span>
+            <span class="val" id="pTemp">5 500 °C</span>
         </div>
         <div class="stat-card">
             <span class="label">Диаметр</span>
             <span class="val" id="pSize">1 392 700 км</span>
         </div>
         <div class="stat-card">
-            <span class="label">Орбитальный период</span>
+            <span class="label">Орбита</span>
             <span class="val" id="pOrbit">Центр</span>
         </div>
         <div class="stat-card">
@@ -214,110 +241,99 @@
         </div>
     </div>
     <p class="description" id="pDesc">
-        Выберите любую планету из меню слева, чтобы камера плавно подлетела к ней для подробного осмотра.
+        Центральная звезда нашей системы, содержащая 99.86% всей ее массы.
     </p>
 </div>
 
-<div class="controls-hint">🖱️ Зажмите мышь, чтобы вращать обзор | Колесико — приближение</div>
-
 <script>
-    // Данные обо всех 9 планетах + Солнце
     const celestialData = [
-        { id: 'sun', name: 'Солнце', type: 'Желтый карлик', color: 0xffaa00, size: 14, dist: 0, speed: 0, temp: '5 500 °C', sizeKm: '1 392 700 км', orbit: 'Центр', moons: '8 планет', desc: 'Центральная звезда нашей системы, содержащая 99.86% всей ее массы.' },
-        { id: 'mercury', name: 'Меркурий', type: 'Планета земной группы', color: 0x888888, size: 1.2, dist: 28, speed: 0.03, temp: 'от -180 до 430 °C', sizeKm: '4 879 км', orbit: '88 дней', moons: '0', desc: 'Самая близкая к Солнцу и самая маленькая планета в Солнечной системе.' },
-        { id: 'venus', name: 'Венера', type: 'Планета земной группы', color: 0xe3bb76, size: 2.2, dist: 42, speed: 0.02, temp: '+464 °C', sizeKm: '12 104 км', orbit: '225 дней', moons: '0', desc: 'Самая горячая планета из-за плотной атмосферы и мощного парникового эффекта.' },
-        { id: 'earth', name: 'Земля', type: 'Планета земной группы', color: 0x2277ff, size: 2.4, dist: 60, speed: 0.015, temp: '+15 °C', sizeKm: '12 742 км', orbit: '365 дней', moons: '1 (Луна)', desc: 'Наш дом — единственное известное место во Вселенной, где есть жизнь.' },
-        { id: 'mars', name: 'Марс', type: 'Планета земной группы', color: 0xcc4422, size: 1.6, dist: 78, speed: 0.01, temp: '-63 °C', sizeKm: '6 779 км', orbit: '687 дней', moons: '2', desc: 'Красная планета с высочайшей горой Олимп и древними руслами рек.' },
-        { id: 'jupiter', name: 'Юпитер', type: 'Газовый гигант', color: 0xd8ca9d, size: 6.0, dist: 110, speed: 0.007, temp: '-110 °C', sizeKm: '139 820 км', orbit: '12 лет', moons: '95', desc: 'Крупнейшая планета системы с гигантским штормом — Большим Красным Пятном.' },
-        { id: 'saturn', name: 'Сатурн', type: 'Газовый гигант', color: 0xead6b8, size: 4.8, dist: 150, speed: 0.005, temp: '-140 °C', sizeKm: '116 460 км', orbit: '29 лет', moons: '146', desc: 'Знаменит своей величественной системой ледяных колец.' },
-        { id: 'uranus', name: 'Уран', type: 'Ледяной гигант', color: 0x4b70dd, size: 3.6, dist: 190, speed: 0.003, temp: '-195 °C', sizeKm: '50 724 км', orbit: '84 года', moons: '28', desc: 'Вращается «на боку» из-за древнего столкновения с крупным объектом.' },
-        { id: 'neptune', name: 'Нептун', type: 'Ледяной гигант', color: 0x274687, size: 3.4, dist: 230, speed: 0.002, temp: '-200 °C', sizeKm: '49 244 км', orbit: '165 лет', moons: '16', desc: 'Самая далекая крупная планета с сильнейшими ветрами в системе.' },
-        { id: 'pluto', name: 'Плутон', type: 'Карликовая планета', color: 0x968370, size: 0.9, dist: 265, speed: 0.001, temp: '-229 °C', sizeKm: '2 376 км', orbit: '248 лет', moons: '5', desc: 'Карликовая планета на краю системы с ледяным «сердцем» на поверхности.' }
+        { id: 'sun', name: 'Солнце', type: 'Желтый карлик', color: 0xffaa00, size: 10, dist: 0, speed: 0, temp: '5 500 °C', sizeKm: '1 392 700 км', orbit: 'Центр', moons: '8 планет', desc: 'Центральная звезда нашей системы, содержащая 99.86% всей ее массы.' },
+        { id: 'mercury', name: 'Меркурий', type: 'Планета', color: 0xa0a0a0, size: 1.2, dist: 22, speed: 0.03, temp: '-180..430 °C', sizeKm: '4 879 км', orbit: '88 дней', moons: '0', desc: 'Самая близкая к Солнцу и самая маленькая планета системы.' },
+        { id: 'venus', name: 'Венера', type: 'Планета', color: 0xe3bb76, size: 2.0, dist: 34, speed: 0.02, temp: '+464 °C', sizeKm: '12 104 км', orbit: '225 дней', moons: '0', desc: 'Самая горячая планета из-за плотной атмосферы и парникового эффекта.' },
+        { id: 'earth', name: 'Земля', type: 'Планета', color: 0x3b82f6, size: 2.2, dist: 48, speed: 0.015, temp: '+15 °C', sizeKm: '12 742 км', orbit: '365 дней', moons: '1', desc: 'Наш дом — единственная планета, где точно известна жизнь.' },
+        { id: 'mars', name: 'Марс', type: 'Планета', color: 0xef4444, size: 1.5, dist: 62, speed: 0.01, temp: '-63 °C', sizeKm: '6 779 км', orbit: '687 дней', moons: '2', desc: 'Красная планета с высочайшей горой Олимп и каньонами.' },
+        { id: 'jupiter', name: 'Юпитер', type: 'Газовый гигант', color: 0xd97706, size: 5.0, dist: 88, speed: 0.007, temp: '-110 °C', sizeKm: '139 820 км', orbit: '12 лет', moons: '95', desc: 'Крупнейшая планета системы с Большим Красным Пятном.' },
+        { id: 'saturn', name: 'Сатурн', type: 'Газовый гигант', color: 0xfde047, size: 4.2, dist: 120, speed: 0.005, temp: '-140 °C', sizeKm: '116 460 км', orbit: '29 лет', moons: '146', desc: 'Знаменит своей величественной системой ледяных колец.' },
+        { id: 'uranus', name: 'Уран', type: 'Ледяной гигант', color: 0x06b6d4, size: 3.2, dist: 150, speed: 0.003, temp: '-195 °C', sizeKm: '50 724 км', orbit: '84 года', moons: '28', desc: 'Вращается «на боку» из-за древнего столкновения.' },
+        { id: 'neptune', name: 'Нептун', type: 'Ледяной гигант', color: 0x1d4ed8, size: 3.0, dist: 180, speed: 0.002, temp: '-200 °C', sizeKm: '49 244 км', orbit: '165 лет', moons: '16', desc: 'Самая далекая планета с сильнейшими ветрами.' },
+        { id: 'pluto', name: 'Плутон', type: 'Карлик', color: 0x94a3b8, size: 0.9, dist: 205, speed: 0.001, temp: '-229 °C', sizeKm: '2 376 км', orbit: '248 лет', moons: '5', desc: 'Карликовая планета на краю системы с ледяным сердцем.' }
     ];
 
-    // Инициализация Three.js
     const container = document.getElementById('webgl-container');
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
-    camera.position.set(0, 120, 280);
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1500);
+    camera.position.set(0, 80, 200);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxDistance = 600;
+    controls.maxDistance = 500;
 
-    // Освещение
-    const ambientLight = new THREE.AmbientLight(0x333344, 1.2);
+    // Освещение (мягкий свет, чтобы планеты не выгорали в белый)
+    const ambientLight = new THREE.AmbientLight(0x404050, 1.8);
     scene.add(ambientLight);
 
-    const sunLight = new THREE.PointLight(0xffffff, 2.5, 1000);
-    scene.add(sunLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    dirLight.position.set(5, 10, 7);
+    scene.add(dirLight);
 
-    // Создание космоса со звездами
+    // Звездное небо
     function createStars() {
         const geometry = new THREE.BufferGeometry();
-        const count = 4000;
+        const count = 3000;
         const positions = new Float32Array(count * 3);
-
         for (let i = 0; i < count * 3; i += 3) {
-            positions[i] = (Math.random() - 0.5) * 1200;
-            positions[i+1] = (Math.random() - 0.5) * 1200;
-            positions[i+2] = (Math.random() - 0.5) * 1200;
+            positions[i] = (Math.random() - 0.5) * 1000;
+            positions[i+1] = (Math.random() - 0.5) * 1000;
+            positions[i+2] = (Math.random() - 0.5) * 1000;
         }
-
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        const material = new THREE.PointsMaterial({ size: 1.2, color: 0xffffff, transparent: true, opacity: 0.8 });
-        const starField = new THREE.Points(geometry, material);
-        scene.add(starField);
+        const material = new THREE.PointsMaterial({ size: 1.0, color: 0xffffff, transparent: true, opacity: 0.7 });
+        scene.add(new THREE.Points(geometry, material));
     }
     createStars();
 
-    // Хранение 3D объектов
     const celestialObjects = [];
     let selectedObject = null;
-
-    // Плавное перемещение камеры
-    let targetCameraPos = new THREE.Vector3();
-    let targetLookAt = new THREE.Vector3();
     let isTransitioning = false;
+    const targetCameraPos = new THREE.Vector3();
+    const targetLookAt = new THREE.Vector3();
 
-    // Генерация планет и орбит
+    // Создание планет
     celestialData.forEach((data) => {
         const pivot = new THREE.Group();
         scene.add(pivot);
 
         let mesh;
-
         if (data.id === 'sun') {
             const geo = new THREE.SphereGeometry(data.size, 32, 32);
             const mat = new THREE.MeshBasicMaterial({ color: data.color });
             mesh = new THREE.Mesh(geo, mat);
-
-            // Свечение Солнца
-            const glowGeo = new THREE.SphereGeometry(data.size * 1.2, 32, 32);
-            const glowMat = new THREE.MeshBasicMaterial({ color: 0xffdd44, transparent: true, opacity: 0.25 });
-            mesh.add(new THREE.Mesh(glowGeo, glowMat));
         } else {
             const geo = new THREE.SphereGeometry(data.size, 32, 32);
-            const mat = new THREE.MeshStandardMaterial({ color: data.color, roughness: 0.7, metalness: 0.1 });
+            // Используем PhongMaterial для красивого объёмного блеска
+            const mat = new THREE.MeshPhongMaterial({ 
+                color: data.color, 
+                shininess: 15,
+                flatShading: false
+            });
             mesh = new THREE.Mesh(geo, mat);
 
-            // Кольца Сатурна
             if (data.id === 'saturn') {
-                const ringGeo = new THREE.RingGeometry(data.size * 1.4, data.size * 2.3, 32);
-                const ringMat = new THREE.MeshBasicMaterial({ color: 0xc2b193, side: THREE.DoubleSide, transparent: true, opacity: 0.7 });
+                const ringGeo = new THREE.RingGeometry(data.size * 1.3, data.size * 2.1, 32);
+                const ringMat = new THREE.MeshBasicMaterial({ color: 0xd97706, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
                 const ring = new THREE.Mesh(ringGeo, ringMat);
-                ring.rotation.x = Math.PI / 2.3;
+                ring.rotation.x = Math.PI / 2.2;
                 mesh.add(ring);
             }
 
-            // Нарисуем линию орбиты
+            // Орбитальная линия
             const orbitGeo = new THREE.BufferGeometry();
             const points = [];
             for (let i = 0; i <= 64; i++) {
@@ -340,9 +356,8 @@
         });
     });
 
-    // Генерация интерфейса кнопок
+    // Меню выбора
     const menuEl = document.getElementById('planetsMenu');
-
     celestialData.forEach((data, index) => {
         const btn = document.createElement('button');
         btn.className = `menu-btn ${index === 0 ? 'active' : ''}`;
@@ -351,7 +366,6 @@
         menuEl.appendChild(btn);
     });
 
-    // Функция выбора планеты
     function selectPlanet(index) {
         document.querySelectorAll('.menu-btn').forEach((btn, i) => {
             btn.classList.toggle('active', i === index);
@@ -360,7 +374,6 @@
         const target = celestialObjects[index];
         selectedObject = target;
 
-        // Обновление карточки
         document.getElementById('pName').innerText = target.data.name;
         document.getElementById('pType').innerText = target.data.type;
         document.getElementById('pTemp').innerText = target.data.temp;
@@ -372,47 +385,51 @@
         isTransitioning = true;
     }
 
-    // Выбираем Солнце при старте
     selectedObject = celestialObjects[0];
 
-    // Анимационный цикл
+    // Кнопка свернуть/развернуть инфо
+    const infoPanel = document.getElementById('infoPanel');
+    document.getElementById('toggleInfo').addEventListener('click', () => {
+        infoPanel.classList.toggle('hidden');
+    });
+
+    // Анимация
     function animate() {
         requestAnimationFrame(animate);
 
-        // Движение планет по орбитам
         celestialObjects.forEach(obj => {
             if (obj.data.speed > 0) {
-                obj.angle += obj.data.speed * 0.3;
+                obj.angle += obj.data.speed * 0.2;
                 obj.mesh.position.x = Math.cos(obj.angle) * obj.data.dist;
                 obj.mesh.position.z = Math.sin(obj.angle) * obj.data.dist;
             }
-            obj.mesh.rotation.y += 0.01;
+            obj.mesh.rotation.y += 0.008;
         });
 
-        // Плавный полет камеры к выбранному объекту
         if (selectedObject) {
             const worldPos = new THREE.Vector3();
             selectedObject.mesh.getWorldPosition(worldPos);
 
-            // Дистанция камеры зависит от размера объекта
-            const offsetDistance = selectedObject.data.size * 4 + 12;
+            // Оптимальный отступ под экран
+            const isMobile = window.innerWidth < 600;
+            const distMultiplier = isMobile ? 5.5 : 4.0;
+            const offsetDistance = selectedObject.data.size * distMultiplier + 10;
             
             targetCameraPos.set(
-                worldPos.x + offsetDistance * 0.8,
-                worldPos.y + offsetDistance * 0.5,
-                worldPos.z + offsetDistance * 0.8
+                worldPos.x + offsetDistance * 0.7,
+                worldPos.y + offsetDistance * 0.4,
+                worldPos.z + offsetDistance * 0.7
             );
             targetLookAt.copy(worldPos);
 
             if (isTransitioning) {
-                camera.position.lerp(targetCameraPos, 0.04);
-                controls.target.lerp(targetLookAt, 0.04);
+                camera.position.lerp(targetCameraPos, 0.05);
+                controls.target.lerp(targetLookAt, 0.05);
 
                 if (camera.position.distanceTo(targetCameraPos) < 0.5) {
                     isTransitioning = false;
                 }
             } else {
-                // Камера плавно сопровождает планету на орбите
                 controls.target.copy(worldPos);
             }
         }
@@ -423,7 +440,6 @@
 
     animate();
 
-    // Ресайз окна
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
