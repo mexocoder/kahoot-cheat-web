@@ -31,7 +31,7 @@
             z-index: 1;
         }
 
-        /* Компактное меню планет слева */
+        /* Меню планет */
         .planets-menu {
             position: absolute;
             left: 12px;
@@ -45,9 +45,9 @@
             padding: 10px;
             border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.12);
-            max-height: calc(100vh - 120px);
+            max-height: calc(100vh - 100px);
             overflow-y: auto;
-            width: 130px;
+            width: 135px;
         }
 
         .planets-menu::-webkit-scrollbar {
@@ -64,7 +64,7 @@
             color: #e2e8f0;
             padding: 8px 10px;
             border-radius: 10px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
             text-align: left;
@@ -93,7 +93,7 @@
             flex-shrink: 0;
         }
 
-        /* Кнопка переключения инфо-панели */
+        /* Кнопка скрыть/показать инфо */
         .toggle-info-btn {
             position: absolute;
             top: 12px;
@@ -115,7 +115,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        /* Панель информации (компактный адаптивный дизайн) */
+        /* Панель информации */
         .info-panel {
             position: absolute;
             right: 12px;
@@ -199,7 +199,7 @@
                 width: 300px;
             }
             .planets-menu {
-                width: 140px;
+                width: 145px;
             }
         }
     </style>
@@ -210,22 +210,19 @@
 
 <div id="webgl-container"></div>
 
-<!-- Кнопка скрыть/показать инфо -->
 <button class="toggle-info-btn" id="toggleInfo">ℹ️</button>
 
-<!-- Меню планет -->
 <div class="planets-menu" id="planetsMenu"></div>
 
-<!-- Панель информации -->
 <div class="info-panel" id="infoPanel">
     <div class="info-header">
-        <h2 id="pName">Солнце</h2>
-        <span class="subtitle" id="pType">Звезда</span>
+        <h2 id="pName">Солнечная Система</h2>
+        <span class="subtitle" id="pType">Звездная система</span>
     </div>
     <div class="info-grid">
         <div class="stat-card">
             <span class="label">Температура</span>
-            <span class="val" id="pTemp">5 500 °C</span>
+            <span class="val" id="pTemp">~5 500 °C</span>
         </div>
         <div class="stat-card">
             <span class="label">Диаметр</span>
@@ -241,12 +238,100 @@
         </div>
     </div>
     <p class="description" id="pDesc">
-        Центральная звезда нашей системы, содержащая 99.86% всей ее массы.
+        Полный обзор нашей планетной системы. Нажмите на любую планету в меню, чтобы подлететь к ней.
     </p>
 </div>
 
 <script>
+    // Генератор процедурных текстур для планет
+    function generateTexture(type) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+
+        if (type === 'sun') {
+            const grad = ctx.createLinearGradient(0, 0, 0, 256);
+            grad.addColorStop(0, '#ffcc00');
+            grad.addColorStop(0.5, '#ff6600');
+            grad.addColorStop(1, '#ff3300');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 256);
+
+            for (let i = 0; i < 400; i++) {
+                ctx.fillStyle = `rgba(255, 255, 200, ${Math.random() * 0.3})`;
+                ctx.beginPath();
+                ctx.arc(Math.random() * 512, Math.random() * 256, Math.random() * 15, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        } else if (type === 'earth') {
+            ctx.fillStyle = '#1c4273';
+            ctx.fillRect(0, 0, 512, 256);
+            ctx.fillStyle = '#2d6a4f';
+            for (let i = 0; i < 40; i++) {
+                ctx.beginPath();
+                ctx.arc(Math.random() * 512, Math.random() * 256, Math.random() * 40 + 10, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            for (let i = 0; i < 30; i++) {
+                ctx.fillRect(Math.random() * 512, Math.random() * 256, Math.random() * 80 + 20, Math.random() * 15 + 5);
+            }
+        } else if (type === 'jupiter') {
+            ctx.fillStyle = '#c99a65';
+            ctx.fillRect(0, 0, 512, 256);
+            for (let y = 0; y < 256; y += 12) {
+                ctx.fillStyle = (y % 24 === 0) ? '#a36d3b' : '#e0be92';
+                ctx.fillRect(0, y + (Math.sin(y)*4), 512, 8);
+            }
+            // Большое красное пятно
+            ctx.fillStyle = '#b53d27';
+            ctx.beginPath();
+            ctx.ellipse(300, 160, 30, 18, 0, 0, Math.PI * 2);
+            ctx.fill();
+        } else if (type === 'saturn') {
+            ctx.fillStyle = '#e3c896';
+            ctx.fillRect(0, 0, 512, 256);
+            for (let y = 0; y < 256; y += 8) {
+                ctx.fillStyle = (y % 16 === 0) ? '#cbb07f' : '#edd8b1';
+                ctx.fillRect(0, y, 512, 4);
+            }
+        } else if (type === 'mars') {
+            ctx.fillStyle = '#9e3820';
+            ctx.fillRect(0, 0, 512, 256);
+            ctx.fillStyle = '#732613';
+            for (let i = 0; i < 50; i++) {
+                ctx.beginPath();
+                ctx.arc(Math.random() * 512, Math.random() * 256, Math.random() * 20 + 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        } else {
+            // Для остальных планет (кратеры/полосы)
+            const colors = {
+                mercury: ['#787878', '#525252'],
+                venus: ['#d1a25a', '#b8863b'],
+                uranus: ['#52b7d6', '#3b91aa'],
+                neptune: ['#2842a3', '#1c2f78'],
+                pluto: ['#9c8e80', '#6e6357']
+            };
+            const pair = colors[type] || ['#888888', '#555555'];
+            ctx.fillStyle = pair[0];
+            ctx.fillRect(0, 0, 512, 256);
+            ctx.fillStyle = pair[1];
+            for (let i = 0; i < 60; i++) {
+                ctx.beginPath();
+                ctx.arc(Math.random() * 512, Math.random() * 256, Math.random() * 15 + 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        return texture;
+    }
+
+    // Данные планет + режим всей системы
     const celestialData = [
+        { id: 'system', name: '🌌 Вся система', type: 'Общий обзор', color: 0x38bdf8, size: 0, dist: 0, speed: 0, temp: 'Разная', sizeKm: '12 млрд км', orbit: 'Солнечная', moons: '200+', desc: 'Вид на всю Солнечную систему сверху. Все планеты вращаются по своим уникальным орбитам.' },
         { id: 'sun', name: 'Солнце', type: 'Желтый карлик', color: 0xffaa00, size: 10, dist: 0, speed: 0, temp: '5 500 °C', sizeKm: '1 392 700 км', orbit: 'Центр', moons: '8 планет', desc: 'Центральная звезда нашей системы, содержащая 99.86% всей ее массы.' },
         { id: 'mercury', name: 'Меркурий', type: 'Планета', color: 0xa0a0a0, size: 1.2, dist: 22, speed: 0.03, temp: '-180..430 °C', sizeKm: '4 879 км', orbit: '88 дней', moons: '0', desc: 'Самая близкая к Солнцу и самая маленькая планета системы.' },
         { id: 'venus', name: 'Венера', type: 'Планета', color: 0xe3bb76, size: 2.0, dist: 34, speed: 0.02, temp: '+464 °C', sizeKm: '12 104 км', orbit: '225 дней', moons: '0', desc: 'Самая горячая планета из-за плотной атмосферы и парникового эффекта.' },
@@ -262,8 +347,8 @@
     const container = document.getElementById('webgl-container');
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1500);
-    camera.position.set(0, 80, 200);
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+    camera.position.set(0, 150, 320);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -273,28 +358,27 @@
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxDistance = 500;
+    controls.maxDistance = 700;
 
-    // Освещение (мягкий свет, чтобы планеты не выгорали в белый)
-    const ambientLight = new THREE.AmbientLight(0x404050, 1.8);
+    const ambientLight = new THREE.AmbientLight(0x555566, 1.5);
     scene.add(ambientLight);
 
     const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
     dirLight.position.set(5, 10, 7);
     scene.add(dirLight);
 
-    // Звездное небо
+    // Звездный фон
     function createStars() {
         const geometry = new THREE.BufferGeometry();
-        const count = 3000;
+        const count = 3500;
         const positions = new Float32Array(count * 3);
         for (let i = 0; i < count * 3; i += 3) {
-            positions[i] = (Math.random() - 0.5) * 1000;
-            positions[i+1] = (Math.random() - 0.5) * 1000;
-            positions[i+2] = (Math.random() - 0.5) * 1000;
+            positions[i] = (Math.random() - 0.5) * 1200;
+            positions[i+1] = (Math.random() - 0.5) * 1200;
+            positions[i+2] = (Math.random() - 0.5) * 1200;
         }
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        const material = new THREE.PointsMaterial({ size: 1.0, color: 0xffffff, transparent: true, opacity: 0.7 });
+        const material = new THREE.PointsMaterial({ size: 1.0, color: 0xffffff, transparent: true, opacity: 0.8 });
         scene.add(new THREE.Points(geometry, material));
     }
     createStars();
@@ -305,35 +389,39 @@
     const targetCameraPos = new THREE.Vector3();
     const targetLookAt = new THREE.Vector3();
 
-    // Создание планет
+    // Создание 3D тел
     celestialData.forEach((data) => {
+        if (data.id === 'system') {
+            celestialObjects.push({ data: data, mesh: null });
+            return;
+        }
+
         const pivot = new THREE.Group();
         scene.add(pivot);
 
         let mesh;
+        const texture = generateTexture(data.id);
+
         if (data.id === 'sun') {
             const geo = new THREE.SphereGeometry(data.size, 32, 32);
-            const mat = new THREE.MeshBasicMaterial({ color: data.color });
+            const mat = new THREE.MeshBasicMaterial({ map: texture });
             mesh = new THREE.Mesh(geo, mat);
         } else {
             const geo = new THREE.SphereGeometry(data.size, 32, 32);
-            // Используем PhongMaterial для красивого объёмного блеска
             const mat = new THREE.MeshPhongMaterial({ 
-                color: data.color, 
-                shininess: 15,
-                flatShading: false
+                map: texture, 
+                shininess: 10
             });
             mesh = new THREE.Mesh(geo, mat);
 
             if (data.id === 'saturn') {
-                const ringGeo = new THREE.RingGeometry(data.size * 1.3, data.size * 2.1, 32);
-                const ringMat = new THREE.MeshBasicMaterial({ color: 0xd97706, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+                const ringGeo = new THREE.RingGeometry(data.size * 1.3, data.size * 2.2, 32);
+                const ringMat = new THREE.MeshBasicMaterial({ color: 0xd97706, side: THREE.DoubleSide, transparent: true, opacity: 0.7 });
                 const ring = new THREE.Mesh(ringGeo, ringMat);
                 ring.rotation.x = Math.PI / 2.2;
                 mesh.add(ring);
             }
 
-            // Орбитальная линия
             const orbitGeo = new THREE.BufferGeometry();
             const points = [];
             for (let i = 0; i <= 64; i++) {
@@ -356,12 +444,18 @@
         });
     });
 
-    // Меню выбора
+    // Генерация меню
     const menuEl = document.getElementById('planetsMenu');
     celestialData.forEach((data, index) => {
         const btn = document.createElement('button');
         btn.className = `menu-btn ${index === 0 ? 'active' : ''}`;
-        btn.innerHTML = `<span class="dot" style="background-color: #${data.color.toString(16).padStart(6, '0')}"></span> ${data.name}`;
+        
+        if (data.id === 'system') {
+            btn.innerHTML = `${data.name}`;
+        } else {
+            btn.innerHTML = `<span class="dot" style="background-color: #${data.color.toString(16).padStart(6, '0')}"></span> ${data.name}`;
+        }
+        
         btn.addEventListener('click', () => selectPlanet(index));
         menuEl.appendChild(btn);
     });
@@ -385,52 +479,64 @@
         isTransitioning = true;
     }
 
+    // Стартуем с режима всей системы
     selectedObject = celestialObjects[0];
 
-    // Кнопка свернуть/развернуть инфо
     const infoPanel = document.getElementById('infoPanel');
     document.getElementById('toggleInfo').addEventListener('click', () => {
         infoPanel.classList.toggle('hidden');
     });
 
-    // Анимация
     function animate() {
         requestAnimationFrame(animate);
 
         celestialObjects.forEach(obj => {
-            if (obj.data.speed > 0) {
+            if (obj.mesh && obj.data.speed > 0) {
                 obj.angle += obj.data.speed * 0.2;
                 obj.mesh.position.x = Math.cos(obj.angle) * obj.data.dist;
                 obj.mesh.position.z = Math.sin(obj.angle) * obj.data.dist;
             }
-            obj.mesh.rotation.y += 0.008;
+            if (obj.mesh) {
+                obj.mesh.rotation.y += 0.008;
+            }
         });
 
         if (selectedObject) {
-            const worldPos = new THREE.Vector3();
-            selectedObject.mesh.getWorldPosition(worldPos);
+            if (selectedObject.data.id === 'system') {
+                // Вид на всю систему
+                targetCameraPos.set(0, 180, 260);
+                targetLookAt.set(0, 0, 0);
+            } else {
+                const worldPos = new THREE.Vector3();
+                selectedObject.mesh.getWorldPosition(worldPos);
 
-            // Оптимальный отступ под экран
-            const isMobile = window.innerWidth < 600;
-            const distMultiplier = isMobile ? 5.5 : 4.0;
-            const offsetDistance = selectedObject.data.size * distMultiplier + 10;
-            
-            targetCameraPos.set(
-                worldPos.x + offsetDistance * 0.7,
-                worldPos.y + offsetDistance * 0.4,
-                worldPos.z + offsetDistance * 0.7
-            );
-            targetLookAt.copy(worldPos);
+                const isMobile = window.innerWidth < 600;
+                let distMultiplier = isMobile ? 5.5 : 4.0;
+                
+                // Специальный отступ для Солнца
+                if (selectedObject.data.id === 'sun') {
+                    distMultiplier = isMobile ? 7.5 : 5.5;
+                }
+
+                const offsetDistance = selectedObject.data.size * distMultiplier + 10;
+                           
+                targetCameraPos.set(
+                    worldPos.x + offsetDistance * 0.7,
+                    worldPos.y + offsetDistance * 0.4,
+                    worldPos.z + offsetDistance * 0.7
+                );
+                targetLookAt.copy(worldPos);
+            }
 
             if (isTransitioning) {
                 camera.position.lerp(targetCameraPos, 0.05);
                 controls.target.lerp(targetLookAt, 0.05);
 
-                if (camera.position.distanceTo(targetCameraPos) < 0.5) {
+                if (camera.position.distanceTo(targetCameraPos) < 0.8) {
                     isTransitioning = false;
                 }
-            } else {
-                controls.target.copy(worldPos);
+            } else if (selectedObject.mesh) {
+                controls.target.copy(targetLookAt);
             }
         }
 
