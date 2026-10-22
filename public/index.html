@@ -1,139 +1,255 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Gallery KG — Полиграфия, объёмные буквы, LED и лайтбоксы</title>
-<style>
-:root{--bg:#fbf8f3;--bg2:#fff;--tx:#1b1b22;--mut:#5d5d6b;--ac:#e8590c;--ac2:#0b7285;--line:#e3ddd2;--glow:0 0 18px rgba(232,89,12,.35);
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0b12;--bg2:#14141e;--tx:#f2f2f7;--mut:#a3a3b5;--ac:#ffb020;--ac2:#27e1ff;--line:#26263a;--glow:0 0 22px rgba(255,176,32,.55);color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0b0b12;--bg2:#14141e;--tx:#f2f2f7;--mut:#a3a3b5;--ac:#ffb020;--ac2:#27e1ff;--line:#26263a;--glow:0 0 22px rgba(255,176,32,.55);color-scheme:dark}
-html{scroll-behavior:smooth;scroll-padding-top:70px}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:1100px;margin:0 auto;padding:0 18px}
-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
-.nav{display:flex;align-items:center;justify-content:space-between;height:58px;gap:10px}
-.logo{font-weight:900;font-size:22px;letter-spacing:1px;color:var(--ac);text-shadow:var(--glow)}
-.logo span{color:var(--tx);text-shadow:none}
-nav{display:flex;gap:16px;font-size:14px;overflow-x:auto;white-space:nowrap}
-nav a{color:var(--mut)}nav a:hover{color:var(--ac)}
-.btn{display:inline-block;background:var(--ac);color:#111;font-weight:700;padding:12px 22px;border-radius:999px;border:0;cursor:pointer;font-size:16px;box-shadow:var(--glow)}
-.btn.o{background:none;color:var(--tx);border:1px solid var(--line);box-shadow:none}
-.hero{padding:64px 0 48px;text-align:center}
-.neon{font-size:clamp(40px,11vw,92px);font-weight:900;line-height:1;margin:0 0 16px;color:var(--ac);text-shadow:var(--glow),0 0 50px var(--ac);letter-spacing:2px}
-.hero p{max-width:640px;margin:0 auto 26px;color:var(--mut);font-size:18px}
-.hero .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-section{padding:46px 0}
-h2{font-size:clamp(26px,5vw,38px);margin:0 0 8px}
-.sub{color:var(--mut);margin:0 0 26px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-.card{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:20px}
-.card .ic{font-size:30px}
-.card h3{margin:8px 0 6px;font-size:19px}
-.card p{margin:0;color:var(--mut);font-size:15px}
-.card:hover{border-color:var(--ac);box-shadow:var(--glow)}
-.lb{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-.box{border-radius:14px;padding:26px 18px;min-height:130px;border:1px solid var(--line);background:var(--bg2);text-align:center;font-weight:700}
-.box small{display:block;color:var(--mut);font-weight:400;margin-top:6px}
-.box.lit{background:#fff7e0;color:#222;box-shadow:inset 0 0 30px rgba(255,190,40,.6),var(--glow)}
-.box.lit small{color:#555}
-.box.thin{padding:10px;min-height:0;height:70px;display:flex;flex-direction:column;justify-content:center;border-color:var(--ac2)}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.chip{padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg2);font-size:14px}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
-.steps{counter-reset:s;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
-.steps div{counter-increment:s;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:18px}
-.steps div::before{content:counter(s);display:block;font-size:30px;font-weight:900;color:var(--ac)}
-form{display:grid;gap:12px;max-width:520px}
-input,select,textarea{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--bg2);color:var(--tx);font:inherit}
-.ct{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:30px}
-footer{border-top:1px solid var(--line);padding:22px 0;color:var(--mut);text-align:center;font-size:14px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Orbit & Rocket Simulator - MVP</title>
+    <style>
+        body {
+            margin: 0;
+            background: #06060f;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #00f3ff;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            background: #0f0f1f;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.1);
+            border: 1px solid #1f1f3f;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas {
+            background: #030308;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .ui-panel {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            background: #00f3ff;
+            border: none;
+            padding: 10px 20px;
+            color: #06060f;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 243, 255, 0.3);
+        }
+
+        button:hover {
+            background: #00bcd4;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .telemetry {
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #a0a0c0;
+            display: flex;
+            gap: 20px;
+        }
+
+        .telemetry span {
+            color: #00f3ff;
+        }
+    </style>
 </head>
 <body>
-<header><div class="wrap nav">
-<a class="logo" href="#top">GALLERY<span> KG</span></a>
-<nav><a href="#uslugi">Услуги</a><a href="#lightbox">Лайтбоксы</a><a href="#materials">Материалы</a><a href="#contact">Контакты</a></nav>
-</div></header>
 
-<main id="top">
-<div class="wrap hero">
-<h1 class="neon">GALLERY KG</h1>
-<p>Полиграфия полного цикла и наружная реклама: объёмные и светящиеся буквы, LED-экраны, лайтбоксы, баннеры, самоклейки и дизайн.</p>
-<div class="btns"><a class="btn" href="#contact">Рассчитать стоимость</a><a class="btn o" href="#uslugi">Наши услуги</a></div>
-</div>
+    <div class="container">
+        <h1>Космический Симулятор [MVP]</h1>
+        <canvas id="simCanvas" width="700" height="450"></canvas>
+        
+        <div class="telemetry">
+            <div>Высота: <span id="alt">0</span> м</div>
+            <div>Скорость: <span id="spd">0</span> м/с</div>
+            <div>Топливо: <span id="fuel">100</span>%</div>
+        </div>
 
-<section id="uslugi"><div class="wrap">
-<h2>Что мы делаем</h2><p class="sub">От идеи и дизайна до монтажа на объекте.</p>
-<div class="grid">
-<div class="card"><div class="ic">🔠</div><h3>Объёмные буквы</h3><p>3D-буквы из пластика, акрила, ПВХ, металла. Любые шрифты и размеры.</p></div>
-<div class="card"><div class="ic">💡</div><h3>Светящиеся буквы</h3><p>Контражур, лицевое и комбинированное свечение. Любой цвет света: тёплый, холодный, RGB.</p></div>
-<div class="card"><div class="ic">🖥️</div><h3>LED-экраны</h3><p>Уличные и внутренние экраны, бегущие строки, медиафасады.</p></div>
-<div class="card"><div class="ic">🖼️</div><h3>Баннеры</h3><p>Широкоформатная печать для фасадов, растяжек и мероприятий.</p></div>
-<div class="card"><div class="ic">🏷️</div><h3>Самоклейки</h3><p>Плёнка, оклейка витрин и транспорта, интерьерная и плоттерная резка.</p></div>
-<div class="card"><div class="ic">🎨</div><h3>Дизайн</h3><p>Логотипы, макеты вывесок, визитки, буклеты, фирменный стиль.</p></div>
-<div class="card"><div class="ic">📄</div><h3>Полиграфия</h3><p>Визитки, листовки, каталоги, этикетки, пакеты — полный спектр печати.</p></div>
-<div class="card"><div class="ic">🛠️</div><h3>Монтаж</h3><p>Доставка, установка и сервис всех конструкций.</p></div>
-</div></div></section>
+        <div class="ui-panel">
+            <button id="engineBtn" onmousedown="setEngine(true)" onmouseup="setEngine(false)" ontouchstart="setEngine(true)" ontouchend="setEngine(false)">Запустить двигатель</button>
+            <button onclick="resetSim()">Сброс</button>
+        </div>
+    </div>
 
-<section id="lightbox"><div class="wrap">
-<h2>Лайтбоксы</h2><p class="sub">От ультратонких до классических, светящиеся и без подсветки.</p>
-<div class="lb">
-<div class="box thin">Ультратонкий лайтбокс<small>Профиль от 15 мм, равномерный свет</small></div>
-<div class="box lit">Обычный светящийся<small>Двусторонний или односторонний, LED-подсветка</small></div>
-<div class="box">Несветящийся<small>Световой короб без подсветки, плоские и объёмные вывески</small></div>
-<div class="box lit">Тканевый лайтбокс<small>Сменная графика, яркая печать без бликов</small></div>
-</div></div></section>
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
 
-<section id="materials"><div class="wrap">
-<h2>Материалы и цвета света</h2><p class="sub">Большой ассортимент — подберём под бюджет и задачу.</p>
-<h3>Материалы</h3>
-<div class="chips"><span class="chip">Акрил</span><span class="chip">ПВХ</span><span class="chip">Композит</span><span class="chip">Нержавейка</span><span class="chip">Алюминий</span><span class="chip">Пластик ПЭТ</span><span class="chip">Оракал / плёнка</span><span class="chip">Баннерная ткань</span><span class="chip">Дерево / МДФ</span></div>
-<h3 style="margin-top:22px">Цвета свечения</h3>
-<div class="chips"><span class="chip"><i class="dot" style="background:#fff3c4"></i>Тёплый белый</span><span class="chip"><i class="dot" style="background:#e8f4ff"></i>Холодный белый</span><span class="chip"><i class="dot" style="background:#ff3b3b"></i>Красный</span><span class="chip"><i class="dot" style="background:#2f6bff"></i>Синий</span><span class="chip"><i class="dot" style="background:#22d65a"></i>Зелёный</span><span class="chip"><i class="dot" style="background:#ffd21f"></i>Жёлтый</span><span class="chip"><i class="dot" style="background:linear-gradient(90deg,red,lime,blue)"></i>RGB</span></div>
-</div></section>
+        // Параметры мира и объектов
+        const planet = { x: 350, y: 500, radius: 180, mass: 5000 };
+        let rocket = { 
+            x: 350, 
+            y: 280, 
+            vx: 3.5, 
+            vy: 0, 
+            fuel: 100,
+            angle: -Math.PI / 2
+        };
 
-<section><div class="wrap">
-<h2>Как мы работаем</h2><p class="sub">Прозрачный процесс без сюрпризов.</p>
-<div class="steps"><div>Заявка и замер</div><div>Дизайн и согласование</div><div>Производство</div><div>Монтаж и гарантия</div></div>
-</div></section>
+        let engineOn = false;
+        let trail = [];
 
-<section id="contact"><div class="wrap ct">
-<div>
-<h2>Оставьте заявку</h2><p class="sub">Ответим в течение часа в рабочее время.</p>
-<form id="f">
-<input id="n" placeholder="Ваше имя" required>
-<input id="p" type="tel" placeholder="Телефон" required>
-<select id="s"><option>Объёмные буквы</option><option>Светящиеся буквы</option><option>Лайтбокс</option><option>LED-экран</option><option>Баннер</option><option>Самоклейка</option><option>Дизайн</option><option>Полиграфия</option></select>
-<textarea id="m" rows="3" placeholder="Размер, материал, цвет света..."></textarea>
-<button class="btn" type="submit">Отправить в WhatsApp</button>
-</form></div>
-<div>
-<h2>Контакты</h2>
-<p class="sub">Бишкек, Кыргызстан</p>
-<p>📞 <a id="tel" href="#"></a></p>
-<p>💬 <a id="wa" href="#">WhatsApp</a></p>
-<p>🕘 Пн–Сб, 09:00–19:00</p>
-</div></div></section>
-</main>
-<footer><div class="wrap">© <span id="y"></span> Gallery KG. Все права защищены.</div></footer>
+        function setEngine(state) {
+            if (rocket.fuel > 0) {
+                engineOn = state;
+            } else {
+                engineOn = false;
+            }
+        }
 
-<script>
-var PHONE="+996 555 000 000"; // замените на ваш номер
-var digits=PHONE.replace(/\D/g,"");
-document.getElementById("tel").textContent=PHONE;
-document.getElementById("tel").href="tel:+"+digits;
-document.getElementById("wa").href="https://wa.me/"+digits;
-document.getElementById("y").textContent=new Date().getFullYear();
-document.getElementById("f").addEventListener("submit",function(e){
- e.preventDefault();
- var t="Здравствуйте! Меня зовут "+n.value+", тел. "+p.value+". Интересует: "+s.value+". "+m.value;
- window.open("https://wa.me/"+digits+"?text="+encodeURIComponent(t),"_blank");
-});
-</script>
+        function resetSim() {
+            rocket = { x: 350, y: 280, vx: 3.5, vy: 0, fuel: 100, angle: -Math.PI / 2 };
+            engineOn = false;
+            trail = [];
+        }
+
+        function update() {
+            // Вектор от ракеты к центру планеты
+            let dx = planet.x - rocket.x;
+            let dy = planet.y - rocket.y;
+            let distSq = dx * dx + dy * dy;
+            let dist = Math.sqrt(distSq);
+
+            // Гравитация (Закон всемирного тяготения)
+            if (dist > 0) {
+                let force = (planet.mass / distSq);
+                rocket.vx += (dx / dist) * force * 0.05;
+                rocket.vy += (dy / dist) * force * 0.05;
+            }
+
+            // Тяга двигателя
+            if (engineOn && rocket.fuel > 0) {
+                let thrustPower = 0.12;
+                rocket.vx += Math.cos(rocket.angle) * thrustPower;
+                rocket.vy += Math.sin(rocket.angle) * thrustPower;
+                rocket.fuel -= 0.15;
+                if (rocket.fuel <= 0) {
+                    rocket.fuel = 0;
+                    engineOn = false;
+                }
+            }
+
+            // Движение
+            rocket.x += rocket.vx;
+            rocket.y += rocket.vy;
+
+            // Направление носа ракеты по вектору движения
+            if (Math.abs(rocket.vx) > 0.1 || Math.abs(rocket.vy) > 0.1) {
+                rocket.angle = Math.atan2(rocket.vy, rocket.vx);
+            }
+
+            // Сохранение следа орбиты
+            if (Math.random() < 0.3) {
+                trail.push({ x: rocket.x, y: rocket.y });
+                if (trail.length > 150) trail.shift();
+            }
+
+            // Проверка столкновения с планетой
+            if (dist <= planet.radius + 8) {
+                rocket.vx = 0;
+                rocket.vy = 0;
+                engineOn = false;
+            }
+
+            // Обновление текста телеметрии
+            let currentAlt = Math.max(0, Math.round(dist - planet.radius));
+            let currentSpd = Math.round(Math.sqrt(rocket.vx * rocket.vx + rocket.vy * rocket.vy) * 10);
+            document.getElementById('alt').innerText = currentAlt;
+            document.getElementById('spd').innerText = currentSpd;
+            document.getElementById('fuel').innerText = Math.round(rocket.fuel);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Рисуем след орбиты
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.25)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i < trail.length; i++) {
+                if (i === 0) ctx.moveTo(trail[i].x, trail[i].y);
+                else ctx.lineTo(trail[i].x, trail[i].y);
+            }
+            ctx.stroke();
+
+            // Рисуем планету
+            let gradient = ctx.createRadialGradient(planet.x, planet.y - 50, 20, planet.x, planet.y, planet.radius);
+            gradient.addColorStop(0, '#4a90e2');
+            gradient.addColorStop(1, '#10254a');
+            
+            ctx.beginPath();
+            ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            ctx.closePath();
+
+            // Рисуем ракету
+            ctx.save();
+            ctx.translate(rocket.x, rocket.y);
+            ctx.rotate(rocket.angle + Math.PI / 2);
+
+            // Корпус ракеты
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(0, -12);
+            ctx.lineTo(-5, 8);
+            ctx.lineTo(5, 8);
+            ctx.closePath();
+            ctx.fill();
+
+            // Огонь из двигателя
+            if (engineOn) {
+                ctx.fillStyle = '#ff5500';
+                ctx.beginPath();
+                ctx.moveTo(-3, 8);
+                ctx.lineTo(0, 18 + Math.random() * 6);
+                ctx.lineTo(3, 8);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    </script>
 </body>
 </html>
