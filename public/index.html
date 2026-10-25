@@ -2,254 +2,231 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Orbit & Rocket Simulator - MVP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Deep Space Atmosphere</title>
     <style>
-        body {
+        html, body {
             margin: 0;
-            background: #06060f;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
+            background-color: #020205;
+            touch-action: none;
         }
-
-        h1 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            color: #00f3ff;
-            letter-spacing: 1px;
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
         }
-
-        .container {
-            background: #0f0f1f;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.1);
-            border: 1px solid #1f1f3f;
+        #ui-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 2, 5, 0.85);
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
+            z-index: 10;
+            font-family: sans-serif;
+            color: #fff;
+            transition: opacity 0.5s ease;
         }
-
-        canvas {
-            background: #030308;
-            border-radius: 8px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(100, 150, 255, 0.5);
         }
-
-        .ui-panel {
-            margin-top: 15px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
+        p {
+            color: #8892b0;
+            margin-bottom: 25px;
+            font-size: 14px;
         }
-
         button {
-            background: #00f3ff;
-            border: none;
-            padding: 10px 20px;
-            color: #06060f;
+            padding: 14px 32px;
+            font-size: 16px;
             font-weight: bold;
-            font-size: 0.9rem;
-            border-radius: 6px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: #000;
+            border: none;
+            border-radius: 25px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 243, 255, 0.3);
-        }
-
-        button:hover {
-            background: #00bcd4;
-            transform: translateY(-2px);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .telemetry {
-            margin-top: 10px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            color: #a0a0c0;
-            display: flex;
-            gap: 20px;
-        }
-
-        .telemetry span {
-            color: #00f3ff;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Космический Симулятор [MVP]</h1>
-        <canvas id="simCanvas" width="700" height="450"></canvas>
-        
-        <div class="telemetry">
-            <div>Высота: <span id="alt">0</span> м</div>
-            <div>Скорость: <span id="spd">0</span> м/с</div>
-            <div>Топливо: <span id="fuel">100</span>%</div>
-        </div>
-
-        <div class="ui-panel">
-            <button id="engineBtn" onmousedown="setEngine(true)" onmouseup="setEngine(false)" ontouchstart="setEngine(true)" ontouchend="setEngine(false)">Запустить двигатель</button>
-            <button onclick="resetSim()">Сброс</button>
-        </div>
+    <div id="ui-overlay">
+        <h1>DEEP COSMOS</h1>
+        <p>Нажмите для запуска полноэкранного режима</p>
+        <button onclick="startCosmos()">ИССЛЕДОВАТЬ</button>
     </div>
 
+    <canvas id="spaceCanvas"></canvas>
+
+    <!-- Подключаем Three.js из CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <script>
-        const canvas = document.getElementById('simCanvas');
-        const ctx = canvas.getContext('2d');
+        let scene, camera, renderer, stars, dust;
+        let mouseX = 0, mouseY = 0;
+        let targetX = 0, targetY = 0;
+        let windowHalfX = window.innerWidth / 2;
+        let windowHalfY = window.innerHeight / 2;
 
-        // Параметры мира и объектов
-        const planet = { x: 350, y: 500, radius: 180, mass: 5000 };
-        let rocket = { 
-            x: 350, 
-            y: 280, 
-            vx: 3.5, 
-            vy: 0, 
-            fuel: 100,
-            angle: -Math.PI / 2
-        };
-
-        let engineOn = false;
-        let trail = [];
-
-        function setEngine(state) {
-            if (rocket.fuel > 0) {
-                engineOn = state;
-            } else {
-                engineOn = false;
+        function startCosmos() {
+            // 1. Полный экран и горизонтальный режим
+            const docElement = document.documentElement;
+            if (docElement.requestFullscreen) docElement.requestFullscreen();
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(() => {});
             }
+
+            // Плавное скрытие меню
+            const overlay = document.getElementById('ui-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.style.display = 'none', 500);
+
+            init3D();
         }
 
-        function resetSim() {
-            rocket = { x: 350, y: 280, vx: 3.5, vy: 0, fuel: 100, angle: -Math.PI / 2 };
-            engineOn = false;
-            trail = [];
+        function init3D() {
+            // Сцена
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x020205, 0.001);
+
+            // Камера
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.z = 1;
+
+            // Рендерер с сочными настройками цвета
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('spaceCanvas'), antialias: true, powerPreference: "high-performance" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+
+            // --- СОЗДАЕМ ЗВЕЗДНОЕ НЕБО (Несколько слоев разной глубины) ---
+            createStarLayers();
+
+            // --- СОЗДАЕМ КОСМИЧЕСКУЮ ПЫЛЬ / ТУМАННОСТЬ ---
+            createDustClouds();
+
+            // События управления (сенсор и мышь)
+            window.addEventListener('resize', onWindowResize);
+            document.addEventListener('pointermove', onPointerMove);
+
+            // Запуск цикла анимации
+            animate();
         }
 
-        function update() {
-            // Вектор от ракеты к центру планеты
-            let dx = planet.x - rocket.x;
-            let dy = planet.y - rocket.y;
-            let distSq = dx * dx + dy * dy;
-            let dist = Math.sqrt(distSq);
+        function createStarLayers() {
+            const starsCount = 3000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(starsCount * 3);
+            const colors = new Float32Array(starsCount * 3);
 
-            // Гравитация (Закон всемирного тяготения)
-            if (dist > 0) {
-                let force = (planet.mass / distSq);
-                rocket.vx += (dx / dist) * force * 0.05;
-                rocket.vy += (dy / dist) * force * 0.05;
+            const colorOptions = [
+                new THREE.Color('#ffffff'), // Белые
+                new THREE.Color('#8ab4f8'), // Холодные голубые
+                new THREE.Color('#f28b82'), // Мягкие красные/оранжевые
+                new THREE.Color('#fef08a')  // Желтоватые
+            ];
+
+            for (let i = 0; i < starsCount * 3; i += 3) {
+                // Раскидываем звезды в большой сфере вокруг камеры
+                const u = Math.random();
+                const v = Math.random();
+                const theta = u * 2.0 * Math.PI;
+                const phi = Math.acos(2.0 * v - 1.0);
+                const r = 400 + Math.random() * 600;
+
+                positions[i]     = r * Math.sin(phi) * Math.cos(theta);
+                positions[i + 1] = r * Math.sin(phi) * Math.sin(theta);
+                positions[i + 2] = r * Math.cos(phi);
+
+                const chosenColor = colorOptions[Math.floor(Math.random() * colorOptions.length)];
+                colors[i]     = chosenColor.r;
+                colors[i + 1] = chosenColor.g;
+                colors[i + 2] = chosenColor.b;
             }
 
-            // Тяга двигателя
-            if (engineOn && rocket.fuel > 0) {
-                let thrustPower = 0.12;
-                rocket.vx += Math.cos(rocket.angle) * thrustPower;
-                rocket.vy += Math.sin(rocket.angle) * thrustPower;
-                rocket.fuel -= 0.15;
-                if (rocket.fuel <= 0) {
-                    rocket.fuel = 0;
-                    engineOn = false;
-                }
-            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-            // Движение
-            rocket.x += rocket.vx;
-            rocket.y += rocket.vy;
+            // Простой кастомный материал с мягкими точками (шейдерный подход через спрайты)
+            const material = new THREE.PointsMaterial({
+                size: 2.5,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
+            });
 
-            // Направление носа ракеты по вектору движения
-            if (Math.abs(rocket.vx) > 0.1 || Math.abs(rocket.vy) > 0.1) {
-                rocket.angle = Math.atan2(rocket.vy, rocket.vx);
-            }
-
-            // Сохранение следа орбиты
-            if (Math.random() < 0.3) {
-                trail.push({ x: rocket.x, y: rocket.y });
-                if (trail.length > 150) trail.shift();
-            }
-
-            // Проверка столкновения с планетой
-            if (dist <= planet.radius + 8) {
-                rocket.vx = 0;
-                rocket.vy = 0;
-                engineOn = false;
-            }
-
-            // Обновление текста телеметрии
-            let currentAlt = Math.max(0, Math.round(dist - planet.radius));
-            let currentSpd = Math.round(Math.sqrt(rocket.vx * rocket.vx + rocket.vy * rocket.vy) * 10);
-            document.getElementById('alt').innerText = currentAlt;
-            document.getElementById('spd').innerText = currentSpd;
-            document.getElementById('fuel').innerText = Math.round(rocket.fuel);
+            stars = new THREE.Points(geometry, material);
+            scene.add(stars);
         }
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function createDustClouds() {
+            // Создаем объемные светящиеся облака пыли для глубины пространства
+            const particleCount = 600;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
 
-            // Рисуем след орбиты
-            ctx.strokeStyle = 'rgba(0, 243, 255, 0.25)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            for (let i = 0; i < trail.length; i++) {
-                if (i === 0) ctx.moveTo(trail[i].x, trail[i].y);
-                else ctx.lineTo(trail[i].x, trail[i].y);
-            }
-            ctx.stroke();
-
-            // Рисуем планету
-            let gradient = ctx.createRadialGradient(planet.x, planet.y - 50, 20, planet.x, planet.y, planet.radius);
-            gradient.addColorStop(0, '#4a90e2');
-            gradient.addColorStop(1, '#10254a');
-            
-            ctx.beginPath();
-            ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2);
-            ctx.fillStyle = gradient;
-            ctx.fill();
-            ctx.closePath();
-
-            // Рисуем ракету
-            ctx.save();
-            ctx.translate(rocket.x, rocket.y);
-            ctx.rotate(rocket.angle + Math.PI / 2);
-
-            // Корпус ракеты
-            ctx.fillStyle = '#ffffff';
-            ctx.beginPath();
-            ctx.moveTo(0, -12);
-            ctx.lineTo(-5, 8);
-            ctx.lineTo(5, 8);
-            ctx.closePath();
-            ctx.fill();
-
-            // Огонь из двигателя
-            if (engineOn) {
-                ctx.fillStyle = '#ff5500';
-                ctx.beginPath();
-                ctx.moveTo(-3, 8);
-                ctx.lineTo(0, 18 + Math.random() * 6);
-                ctx.lineTo(3, 8);
-                ctx.closePath();
-                ctx.fill();
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                positions[i]     = (Math.random() - 0.5) * 800;
+                positions[i + 1] = (Math.random() - 0.5) * 800;
+                positions[i + 2] = (Math.random() - 0.5) * 800;
             }
 
-            ctx.restore();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 25,
+                color: new THREE.Color('#1b263b'), // Глубокий сине-фиолетовый туман
+                transparent: true,
+                opacity: 0.15,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+
+            dust = new THREE.Points(geometry, material);
+            scene.add(dust);
         }
 
-        function loop() {
-            update();
-            draw();
-            requestAnimationFrame(loop);
+        function onPointerMove(event) {
+            // Считаем координаты движения пальца/мыши относительно центра экрана
+            mouseX = (event.clientX - windowHalfX) * 0.001;
+            mouseY = (event.clientY - windowHalfY) * 0.001;
         }
 
-        loop();
+        function onWindowResize() {
+            windowHalfX = window.innerWidth / 2;
+            windowHalfY = window.innerHeight / 2;
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Плавная инерция камеры за движением пальца (эффект параллакса)
+            targetX += (mouseX - targetX) * 0.05;
+            targetY += (mouseY - targetY) * 0.05;
+
+            camera.rotation.y = targetX * 1.5;
+            camera.rotation.x = targetY * 1.5;
+
+            // Медленное вращение звезд и туманностей для живой атмосферы
+            if (stars) stars.rotation.y += 0.0002;
+            if (dust)  dust.rotation.y  += 0.0004;
+
+            renderer.render(scene, camera);
+        }
     </script>
 </body>
 </html>
