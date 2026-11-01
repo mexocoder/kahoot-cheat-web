@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Visual Novel UI</title>
+    <title>Anime Visual Novel - Deluxe Edition</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -19,61 +19,68 @@
             font-family: 'Mochiy Pop One', sans-serif;
         }
         .glass-panel {
-            background: rgba(15, 15, 25, 0.85);
+            background: rgba(15, 15, 25, 0.88);
             backdrop-filter: blur(16px);
-            border: 2px solid rgba(255, 102, 196, 0.3);
-            box-shadow: 0 0 25px rgba(255, 102, 196, 0.15), inset 0 0 15px rgba(139, 92, 246, 0.1);
+            border: 2px solid rgba(255, 102, 196, 0.35);
+            box-shadow: 0 0 30px rgba(255, 102, 196, 0.2), inset 0 0 15px rgba(139, 92, 246, 0.15);
         }
         .neon-btn {
-            background: linear-gradient(135deg, rgba(255,102,196,0.2), rgba(139,92,246,0.3));
-            border: 1px solid rgba(255, 102, 196, 0.5);
+            background: linear-gradient(135deg, rgba(255,102,196,0.25), rgba(139,92,246,0.35));
+            border: 1px solid rgba(255, 102, 196, 0.6);
             transition: all 0.2s ease;
         }
         .neon-btn:hover {
-            background: linear-gradient(135deg, rgba(255,102,196,0.4), rgba(139,92,246,0.5));
+            background: linear-gradient(135deg, rgba(255,102,196,0.45), rgba(139,92,246,0.55));
             border-color: #ff66c4;
-            box-shadow: 0 0 15px rgba(255, 102, 196, 0.5);
+            box-shadow: 0 0 20px rgba(255, 102, 196, 0.6);
             transform: translateY(-2px);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
         }
     </style>
 </head>
 <body class="w-screen h-screen flex flex-col justify-between p-4 sm:p-8 relative select-none">
 
-    <!-- Верхняя панель (Статус / Назад) -->
+    <!-- Верхняя панель (Статус / Аудио плеер) -->
     <header class="flex justify-between items-center z-10">
         <div class="glass-panel px-4 py-2 rounded-xl flex items-center gap-2">
             <span class="w-3 h-3 rounded-full bg-pink-500 animate-ping"></span>
-            <span class="font-anime text-xs text-pink-300 tracking-wider">PROJECT: VN_LOCAL</span>
+            <span class="font-anime text-xs text-pink-300 tracking-wider">CYBER_VN.exe</span>
         </div>
-        <div class="glass-panel px-4 py-2 rounded-xl text-xs font-semibold text-purple-300">
-            Глава 1: Начало пути
-        </div>
+        
+        <!-- Кнопка музыки -->
+        <button id="audio-toggle" class="glass-panel px-4 py-2 rounded-xl text-xs font-semibold text-pink-300 hover:text-white flex items-center gap-2 neon-btn">
+            <span>🎵 Музыка: <span id="audio-status">ВЫКЛ</span></span>
+        </button>
     </header>
 
-    <!-- Центральная область (Персонаж / Сцена) -->
+    <!-- Центральная область (Персонаж) -->
     <main class="flex-1 flex flex-col items-center justify-center relative my-4">
-        <!-- Аниме силуэт / Карточка персонажа -->
-        <div id="character-container" class="relative transition-all duration-500 flex flex-col items-center">
+        <div id="character-container" class="relative flex flex-col items-center animate-float">
             <!-- Эффект свечения под персонажем -->
-            <div class="absolute -bottom-6 w-48 h-8 bg-pink-500/30 rounded-full blur-xl"></div>
+            <div class="absolute -bottom-6 w-52 h-10 bg-pink-500/40 rounded-full blur-2xl"></div>
             
-            <!-- Заглушка аватарки в аниме стиле (можно заменить на картинку <img src="...">) -->
-            <div class="w-40 h-40 sm:w-56 sm:h-56 rounded-3xl glass-panel flex flex-col items-center justify-center relative overflow-hidden group border-pink-500/50">
-                <div class="absolute inset-0 bg-gradient-to-t from-purple-900/40 to-transparent"></div>
-                <span class="text-6xl sm:text-7xl group-hover:scale-110 transition-transform duration-300">✨</span>
-                <span class="font-anime text-xs text-pink-200 mt-2 tracking-widest">АЙРИС</span>
+            <!-- Аватар персонажа (сюда можно поставить GIF или картинку через <img src="...">) -->
+            <div class="w-44 h-44 sm:w-60 sm:h-60 rounded-3xl glass-panel flex flex-col items-center justify-center relative overflow-hidden group border-pink-500/60 shadow-[0_0_40px_rgba(255,102,196,0.3)]">
+                <div class="absolute inset-0 bg-gradient-to-t from-purple-900/50 to-transparent"></div>
+                <!-- Замените этот блок на <img src="your-gif.gif" class="w-full h-full object-cover"> если найдете GIF -->
+                <span class="text-7xl sm:text-8xl group-hover:scale-110 transition-transform duration-300">✨🦊</span>
+                <span class="font-anime text-xs text-pink-200 mt-3 tracking-widest bg-black/40 px-3 py-1 rounded-full border border-pink-500/30">АЙРИС [AI]</span>
             </div>
         </div>
 
-        <!-- Контейнер для выборов (появляется в нужный момент) -->
-        <div id="choices-container" class="absolute bottom-4 flex flex-col gap-2.5 w-full max-w-md z-20 hidden">
-            <!-- Скрипт сюда динамически добавит кнопки выбора -->
-        </div>
+        <!-- Контейнер для выборов -->
+        <div id="choices-container" class="absolute bottom-4 flex flex-col gap-2.5 w-full max-w-md z-20 hidden"></div>
     </main>
 
-    <!-- Нижняя панель (Диалоговое окно Visual Novel) -->
+    <!-- Нижняя панель (Диалоговое окно) -->
     <footer class="w-full max-w-4xl mx-auto z-10">
-        <div class="glass-panel rounded-2xl p-4 sm:p-6 relative cursor-pointer" id="dialogue-box">
+        <div class="glass-panel rounded-2xl p-4 sm:p-6 relative cursor-pointer shadow-2xl" id="dialogue-box">
             <!-- Имя персонажа -->
             <div class="absolute -top-3.5 left-6 bg-gradient-to-r from-pink-600 to-purple-600 px-4 py-1 rounded-full border border-pink-300/40 shadow-lg">
                 <span id="char-name" class="font-anime text-xs sm:text-sm text-white tracking-wider">Айрис</span>
@@ -91,18 +98,46 @@
         </div>
     </footer>
 
-    <!-- Скрипт логики новеллы -->
+    <!-- Аудио элемент для фоновой музыки (можно заменить src на свой локальный mp3) -->
+    <audio id="bgm" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf756.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Скрипт логики, звуков и новеллы -->
     <script>
-        // Сценарий диалогов
+        // --- WEB AUDIO API (Генерация звуков кликов без внешних файлов) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playClickSound() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.05);
+            
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        // --- СЦЕНАРИЙ НОВЕЛЛЫ ---
         const story = [
-            { name: "Айрис", text: "Оу, привет! Ты наконец-то заглянул в мой проект. Как тебе моя новая локальная страничка?" },
-            { name: "Айрис", text: "Здесь можно настроить всё под себя: цвета, музыку, аниме-анимации и даже свои собственные диалоги.", choices: [
-                { text: "Выглядит очень круто и стильно!", next: 2 },
-                { text: "Научи меня делать такую же красоту на JS!", next: 3 }
+            { name: "Айрис", text: "Ого, ты обновил движок! Теперь здесь есть звуковые эффекты и анимация парения~ Как тебе?" },
+            { name: "Айрис", text: "А еще можно включить фоновую ло-фай музыку сверху справа, чтобы расслабиться во время кодинга.", choices: [
+                { text: "Музыка и звуки просто топ!", next: 2 },
+                { text: "А как сюда добавить свою аниме-гифку?", next: 3 }
             ]},
-            { name: "Айрис", text: "Хе-хе, я знала, что тебе понравится! Неон и стекломорфизм — лучшее сочетание для киберпанка.", next: 4 },
-            { name: "Айрис", text: "Отличный настрой! Для этого нужен всего лишь HTML, чуточку Tailwind и немного магии JavaScript.", next: 4 },
-            { name: "Айрис", text: "Ну что, продолжим кодить или посидим тут еще немного?" }
+            { name: "Айрис", text: "Хе-хе, стараюсь для тебя! Локальные проекты — это лучший способ прокачать навыки веб-разработки.", next: 4 },
+            { name: "Айрис", text: "Очень просто! Просто скачай любую анимацию в формате .gif и замени ею эмодзи в коде через тег <img>.", next: 4 },
+            { name: "Айрис", text: "Ну что, продолжим создавать крутые штуки вместе?" }
         ];
 
         let currentStep = 0;
@@ -125,7 +160,7 @@
                 if (charIndex < text.length) {
                     textElement.textContent += text.charAt(charIndex);
                     charIndex++;
-                    timer = setTimeout(addChar, 25); // Скорость печати текста
+                    timer = setTimeout(addChar, 25);
                 } else {
                     isTyping = false;
                     checkChoices();
@@ -152,7 +187,8 @@
                     btn.className = "neon-btn w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold text-white text-left shadow-lg flex items-center justify-between";
                     btn.innerHTML = `<span>${choice.text}</span> <span>✨</span>`;
                     btn.onclick = (e) => {
-                        e.stopPropagation(); // чтобы не срабатывал клик по диалогу
+                        e.stopPropagation();
+                        playClickSound();
                         showStep(choice.next);
                     };
                     choicesContainer.appendChild(btn);
@@ -161,26 +197,43 @@
             }
         }
 
-        // Клик по диалоговому окну для переключения реплик
+        // Клик по диалогу
         dialogueBox.addEventListener('click', () => {
+            playClickSound();
             if (isTyping) {
-                // Если текст еще печатается — сразу показываем целиком
                 clearTimeout(timer);
                 textElement.textContent = story[currentStep].text;
                 isTyping = false;
                 checkChoices();
             } else {
-                // Если есть активные выборы, ждем нажатия на них
                 if (story[currentStep].choices) return;
-
-                // Иначе переходим к следующей реплике (если она линейная)
                 if (currentStep < story.length - 1 && currentStep !== 1) {
                     showStep(currentStep + 1);
                 }
             }
         });
 
-        // Запуск первой реплики при загрузке
+        // Управление фоновой музыкой
+        const bgm = document.getElementById('bgm');
+        const audioToggle = document.getElementById('audio-toggle');
+        const audioStatus = document.getElementById('audio-status');
+        let isMusicPlaying = false;
+
+        audioToggle.addEventListener('click', () => {
+            playClickSound();
+            isMusicPlaying = !isMusicPlaying;
+            if (isMusicPlaying) {
+                bgm.play().catch(() => {});
+                audioStatus.textContent = "ВКЛ";
+                audioToggle.classList.add("border-pink-400", "shadow-[0_0_15px_rgba(255,102,196,0.5)]");
+            } else {
+                bgm.pause();
+                audioStatus.textContent = "ВЫКЛ";
+                audioToggle.classList.remove("border-pink-400", "shadow-[0_0_15px_rgba(255,102,196,0.5)]");
+            }
+        });
+
+        // Запуск
         window.onload = () => {
             showStep(0);
         };
