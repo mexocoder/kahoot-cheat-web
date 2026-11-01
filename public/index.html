@@ -1,232 +1,682 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Deep Space Atmosphere</title>
+    <title>3D Симуляция звезды Сириус А</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #020205;
-            touch-action: none;
+            background-color: #000000 !important;
+            font-family: 'Inter', sans-serif;
+            color: #f1f5f9;
+            user-select: none;
+            -webkit-user-select: none;
         }
-        canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
         }
-        #ui-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(2, 2, 5, 0.85);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            font-family: sans-serif;
-            color: #fff;
-            transition: opacity 0.5s ease;
+
+        /* Monochromatic Dark Glassmorphism */
+        .glass-panel {
+            background: rgba(10, 10, 12, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.8),
+                        inset 0 0 15px rgba(255, 255, 255, 0.03);
         }
-        h1 {
-            margin: 0 0 10px 0;
-            font-size: 24px;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(100, 150, 255, 0.5);
+
+        .glass-button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        p {
-            color: #8892b0;
-            margin-bottom: 25px;
-            font-size: 14px;
+
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
         }
-        button {
-            padding: 14px 32px;
-            font-size: 16px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: #000;
-            border: none;
-            border-radius: 25px;
+
+        .glass-button.active {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: #ffffff;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Custom Monochromatic Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            height: 5px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #ffffff;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            transition: transform 0.1s ease;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.4);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        #canvas-container canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
         }
     </style>
 </head>
-<body>
+<body class="w-screen h-screen relative bg-black">
 
-    <div id="ui-overlay">
-        <h1>DEEP COSMOS</h1>
-        <p>Нажмите для запуска полноэкранного режима</p>
-        <button onclick="startCosmos()">ИССЛЕДОВАТЬ</button>
+    <!-- Canvas Container -->
+    <div id="canvas-container" class="w-full h-full absolute inset-0 z-0 bg-black"></div>
+
+    <!-- UI Overlay Header -->
+    <header class="absolute top-4 left-4 z-10 pointer-events-none">
+        <div class="glass-panel p-3.5 sm:p-4 rounded-xl max-w-xs pointer-events-auto flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                <i data-lucide="sparkle" class="w-6 h-6 animate-pulse"></i>
+            </div>
+            <div>
+                <h1 class="font-orbitron font-extrabold text-base sm:text-lg text-white tracking-widest">SIRIUS 3D</h1>
+                <p class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-widest">Альфа Большого Пса</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Top Right Stats Badge -->
+    <div class="absolute top-4 right-4 z-10 pointer-events-none hidden sm:block">
+        <div class="glass-panel px-4 py-2 rounded-lg text-xs font-mono text-gray-300 flex items-center gap-4 pointer-events-auto">
+            <div>СПЕКТР: <span class="text-white font-bold">A1V (Белая звезда)</span></div>
+            <div>ТЕМПЕРАТУРА: <span class="text-white font-bold">9,940 K</span></div>
+            <div>РАССТОЯНИЕ: <span class="text-white font-bold">8.6 св. лет</span></div>
+        </div>
     </div>
 
-    <canvas id="spaceCanvas"></canvas>
+    <!-- UI Control Panel -->
+    <main class="absolute bottom-4 left-4 right-4 sm:right-4 sm:top-20 sm:left-auto sm:bottom-auto z-10 sm:w-80 pointer-events-auto">
+        <div class="glass-panel p-4 sm:p-5 rounded-2xl flex flex-col gap-4 max-h-[75vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <span class="font-orbitron font-semibold text-xs sm:text-sm text-gray-200 tracking-wider flex items-center gap-2">
+                    <i data-lucide="sliders" class="w-4 h-4 text-white"></i> ПАНЕЛЬ УПРАВЛЕНИЯ
+                </span>
+                <button id="btn-toggle-ui" class="text-gray-400 hover:text-white sm:hidden p-1">
+                    <i data-lucide="chevron-down" class="w-5 h-5 transition-transform duration-300" id="ui-arrow"></i>
+                </button>
+            </div>
 
-    <!-- Подключаем Three.js из CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+            <div id="controls-body" class="flex flex-col gap-4">
+                <!-- Color Tints -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs text-gray-400 font-medium">Спектральный режим</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button class="color-preset glass-button active py-2 rounded-lg text-xs font-semibold text-white flex flex-col items-center gap-1" data-color="sirius">
+                            <span class="w-3 h-3 rounded-full bg-white shadow-[0_0_8px_#ffffff]"></span>
+                            Сириус А
+                        </button>
+                        <button class="color-preset glass-button py-2 rounded-lg text-xs font-semibold text-gray-300 flex flex-col items-center gap-1" data-color="ice">
+                            <span class="w-3 h-3 rounded-full bg-cyan-200 shadow-[0_0_8px_#a5f3fc]"></span>
+                            Ледяной
+                        </button>
+                        <button class="color-preset glass-button py-2 rounded-lg text-xs font-semibold text-gray-300 flex flex-col items-center gap-1" data-color="mono">
+                            <span class="w-3 h-3 rounded-full bg-gray-400 shadow-[0_0_8px_#9ca3af]"></span>
+                            Серебро
+                        </button>
+                    </div>
+                </div>
 
-    <script>
-        let scene, camera, renderer, stars, dust;
-        let mouseX = 0, mouseY = 0;
-        let targetX = 0, targetY = 0;
-        let windowHalfX = window.innerWidth / 2;
-        let windowHalfY = window.innerHeight / 2;
+                <!-- Rotation Speed Slider -->
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-gray-400 flex items-center gap-1.5">
+                            <i data-lucide="rotate-cw" class="w-3.5 h-3.5 text-white"></i> Скорость вращения
+                        </span>
+                        <span id="val-rotation" class="text-white font-mono">1.0x</span>
+                    </div>
+                    <input type="range" id="slider-rotation" min="0" max="4" step="0.1" value="1.0" class="w-full">
+                </div>
 
-        function startCosmos() {
-            // 1. Полный экран и горизонтальный режим
-            const docElement = document.documentElement;
-            if (docElement.requestFullscreen) docElement.requestFullscreen();
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(() => {});
+                <!-- Corona Intensity Slider -->
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-gray-400 flex items-center gap-1.5">
+                            <i data-lucide="sun" class="w-3.5 h-3.5 text-white"></i> Свечение короны
+                        </span>
+                        <span id="val-glow" class="text-white font-mono">1.4x</span>
+                    </div>
+                    <input type="range" id="slider-glow" min="0.2" max="3.0" step="0.1" value="1.4" class="w-full">
+                </div>
+
+                <!-- Plasma Speed Slider -->
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-gray-400 flex items-center gap-1.5">
+                            <i data-lucide="activity" class="w-3.5 h-3.5 text-white"></i> Динамика плазмы
+                        </span>
+                        <span id="val-plasma" class="text-white font-mono">1.0x</span>
+                    </div>
+                    <input type="range" id="slider-plasma" min="0.1" max="3.0" step="0.1" value="1.0" class="w-full">
+                </div>
+
+                <!-- Buttons grid -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button id="btn-toggle-particles" class="glass-button active py-2 px-3 rounded-lg text-xs font-semibold text-gray-200 flex items-center justify-center gap-2">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-white"></i> Частицы
+                    </button>
+                    <button id="btn-pause" class="glass-button py-2 px-3 rounded-lg text-xs font-semibold text-gray-200 flex items-center justify-center gap-2">
+                        <i data-lucide="pause" class="w-4 h-4 text-white" id="icon-pause"></i> Пауза
+                    </button>
+                </div>
+
+                <!-- Reset Camera -->
+                <button id="btn-reset-cam" class="w-full glass-button py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white flex items-center justify-center gap-2 border-dashed">
+                    <i data-lucide="compass" class="w-4 h-4 text-white"></i> Сбросить камеру
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Help -->
+    <footer class="absolute bottom-4 left-4 z-10 pointer-events-none hidden md:block">
+        <div class="glass-panel px-4 py-2 rounded-lg text-xs text-gray-400 flex items-center gap-4">
+            <span class="flex items-center gap-1.5"><i data-lucide="mouse-pointer" class="w-3.5 h-3.5 text-white"></i> Вращение: ЛКМ</span>
+            <span class="flex items-center gap-1.5"><i data-lucide="move" class="w-3.5 h-3.5 text-white"></i> Панорама: ПКМ</span>
+            <span class="flex items-center gap-1.5"><i data-lucide="zoom-in" class="w-3.5 h-3.5 text-white"></i> Зум: Колесико</span>
+        </div>
+    </footer>
+
+    <!-- Three.js module import -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        lucide.createIcons();
+
+        // 1. SCENE & RENDERER SETUP (FIXED BLACK BACKGROUND)
+        const container = document.getElementById('canvas-container');
+        
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+        scene.fog = new THREE.FogExp2(0x000000, 0.0004);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 12, 60);
+
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true, 
+            alpha: false,
+            powerPreference: "high-performance"
+        });
+        renderer.setClearColor(0x000000, 1.0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.3;
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 16;
+        controls.maxDistance = 160;
+
+        // 2. SIRIUS PROCEDURAL TEXTURE GENERATOR (WHITE/SILVER/BLACK MONO)
+        function createSiriusTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // Monochrome dark-to-light gradient background
+            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.3, '#d1d5db');
+            grad.addColorStop(0.7, '#9ca3af');
+            grad.addColorStop(1, '#ffffff');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Granular plasma noise (monochrome/silver contrast)
+            for (let i = 0; i < 50000; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const radius = Math.random() * 1.8 + 0.4;
+                const opacity = Math.random() * 0.7;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = Math.random() > 0.4 
+                    ? `rgba(255, 255, 255, ${opacity})` 
+                    : `rgba(30, 35, 45, ${opacity * 0.8})`;
+                ctx.fill();
             }
 
-            // Плавное скрытие меню
-            const overlay = document.getElementById('ui-overlay');
-            overlay.style.opacity = '0';
-            setTimeout(() => overlay.style.display = 'none', 500);
+            // Dark plasma spots
+            for (let i = 0; i < 16; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * (canvas.height * 0.7) + canvas.height * 0.15;
+                const r = Math.random() * 10 + 3;
+                
+                const spotGrad = ctx.createRadialGradient(x, y, 1, x, y, r);
+                spotGrad.addColorStop(0, 'rgba(10, 12, 18, 0.9)');
+                spotGrad.addColorStop(0.6, 'rgba(60, 65, 75, 0.4)');
+                spotGrad.addColorStop(1, 'transparent');
 
-            init3D();
-        }
-
-        function init3D() {
-            // Сцена
-            scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x020205, 0.001);
-
-            // Камера
-            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
-            camera.position.z = 1;
-
-            // Рендерер с сочными настройками цвета
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('spaceCanvas'), antialias: true, powerPreference: "high-performance" });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.2;
-
-            // --- СОЗДАЕМ ЗВЕЗДНОЕ НЕБО (Несколько слоев разной глубины) ---
-            createStarLayers();
-
-            // --- СОЗДАЕМ КОСМИЧЕСКУЮ ПЫЛЬ / ТУМАННОСТЬ ---
-            createDustClouds();
-
-            // События управления (сенсор и мышь)
-            window.addEventListener('resize', onWindowResize);
-            document.addEventListener('pointermove', onPointerMove);
-
-            // Запуск цикла анимации
-            animate();
-        }
-
-        function createStarLayers() {
-            const starsCount = 3000;
-            const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(starsCount * 3);
-            const colors = new Float32Array(starsCount * 3);
-
-            const colorOptions = [
-                new THREE.Color('#ffffff'), // Белые
-                new THREE.Color('#8ab4f8'), // Холодные голубые
-                new THREE.Color('#f28b82'), // Мягкие красные/оранжевые
-                new THREE.Color('#fef08a')  // Желтоватые
-            ];
-
-            for (let i = 0; i < starsCount * 3; i += 3) {
-                // Раскидываем звезды в большой сфере вокруг камеры
-                const u = Math.random();
-                const v = Math.random();
-                const theta = u * 2.0 * Math.PI;
-                const phi = Math.acos(2.0 * v - 1.0);
-                const r = 400 + Math.random() * 600;
-
-                positions[i]     = r * Math.sin(phi) * Math.cos(theta);
-                positions[i + 1] = r * Math.sin(phi) * Math.sin(theta);
-                positions[i + 2] = r * Math.cos(phi);
-
-                const chosenColor = colorOptions[Math.floor(Math.random() * colorOptions.length)];
-                colors[i]     = chosenColor.r;
-                colors[i + 1] = chosenColor.g;
-                colors[i + 2] = chosenColor.b;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = spotGrad;
+                ctx.fill();
             }
 
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-            // Простой кастомный материал с мягкими точками (шейдерный подход через спрайты)
-            const material = new THREE.PointsMaterial({
-                size: 2.5,
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.8,
-                blending: THREE.AdditiveBlending,
-                sizeAttenuation: true
-            });
-
-            stars = new THREE.Points(geometry, material);
-            scene.add(stars);
+            return new THREE.CanvasTexture(canvas);
         }
 
-        function createDustClouds() {
-            // Создаем объемные светящиеся облака пыли для глубины пространства
-            const particleCount = 600;
-            const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
+        const siriusTexture = createSiriusTexture();
+        siriusTexture.wrapS = THREE.RepeatWrapping;
+        siriusTexture.wrapT = THREE.ClampToEdgeWrapping;
 
-            for (let i = 0; i < particleCount * 3; i += 3) {
-                positions[i]     = (Math.random() - 0.5) * 800;
-                positions[i + 1] = (Math.random() - 0.5) * 800;
-                positions[i + 2] = (Math.random() - 0.5) * 800;
+        // 3. SHADERS FOR SIRIUS A PLASMA & DISPLACEMENT
+        const sunVertexShader = `
+            varying vec2 vUv;
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+            uniform float uTime;
+            uniform float uPlasmaSpeed;
+
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+            vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+            
+            float snoise(vec3 v) {
+                const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+                const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+                vec3 i  = floor(v + dot(v, C.yyy) );
+                vec3 x0 = v - i + dot(i, C.xxx) ;
+                vec3 g = step(x0.yzx, x0.xyz);
+                vec3 l = 1.0 - g;
+                vec3 i1 = min( g.xyz, l.zxy );
+                vec3 i2 = max( g.xyz, l.zxy );
+                vec3 x1 = x0 - i1 + C.xxx;
+                vec3 x2 = x0 - i2 + C.yyy;
+                vec3 x3 = x0 - D.yyy;
+                i = mod289(i);
+                vec4 p = permute( permute( permute(
+                            i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+                        + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
+                        + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+                float n_ = 0.142857142857;
+                vec3  ns = n_ * D.wyz - D.xzx;
+                vec4 j = p - 49.0 * floor(p * ns.z);
+                vec4 x_ = floor(j * ns.z);
+                vec4 y_ = floor(j - 7.0 * x_ );
+                vec4 x = x_ *ns.x + ns.yyyy;
+                vec4 y = y_ *ns.x + ns.yyyy;
+                vec4 h = 1.0 - abs(x) - abs(y);
+                vec4 b0 = vec4( x.xy, y.xy );
+                vec4 b1 = vec4( x.zw, y.zw );
+                vec4 s0 = floor(b0)*2.0 + 1.0;
+                vec4 s1 = floor(b1)*2.0 + 1.0;
+                vec4 sh = -step(h, vec4(0.0));
+                vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+                vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+                vec3 p0 = vec3(a0.xy,h.x);
+                vec3 p1 = vec3(a0.zw,h.y);
+                vec3 p2 = vec3(a1.xy,h.z);
+                vec3 p3 = vec3(a1.zw,h.w);
+                vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+                p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+                vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+                m = m * m;
+                return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
             }
 
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            void main() {
+                vUv = uv;
+                vNormal = normalize(normalMatrix * normal);
+                vPosition = position;
 
-            const material = new THREE.PointsMaterial({
-                size: 25,
-                color: new THREE.Color('#1b263b'), // Глубокий сине-фиолетовый туман
-                transparent: true,
-                opacity: 0.15,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false
-            });
+                float noise = snoise(position * 0.18 + vec3(uTime * uPlasmaSpeed * 0.25));
+                vec3 newPosition = position + normal * noise * 0.3;
 
-            dust = new THREE.Points(geometry, material);
-            scene.add(dust);
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+            }
+        `;
+
+        const sunFragmentShader = `
+            uniform sampler2D uTexture;
+            uniform float uTime;
+            uniform float uPlasmaSpeed;
+            uniform vec3 uColorTint;
+            varying vec2 vUv;
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+
+            void main() {
+                vec2 animatedUv = vUv;
+                animatedUv.x += sin(vUv.y * 25.0 + uTime * uPlasmaSpeed * 0.4) * 0.003;
+                animatedUv.y += cos(vUv.x * 25.0 + uTime * uPlasmaSpeed * 0.4) * 0.003;
+
+                vec4 texColor = texture2D(uTexture, animatedUv);
+                
+                vec3 viewDir = normalize(-vPosition);
+                float limb = 1.0 - max(0.0, dot(viewDir, vNormal));
+                limb = pow(limb, 0.7);
+
+                vec3 finalColor = texColor.rgb * uColorTint;
+                finalColor += uColorTint * limb * 0.6; // High intensity silver/white rim
+
+                gl_FragColor = vec4(finalColor, 1.0);
+            }
+        `;
+
+        const starRadius = 11.5;
+        const starGeometry = new THREE.SphereGeometry(starRadius, 64, 64);
+        
+        const starUniforms = {
+            uTexture: { value: siriusTexture },
+            uTime: { value: 0 },
+            uPlasmaSpeed: { value: 1.0 },
+            uColorTint: { value: new THREE.Color(0xffffff) }
+        };
+
+        const starMaterial = new THREE.ShaderMaterial({
+            vertexShader: sunVertexShader,
+            fragmentShader: sunFragmentShader,
+            uniforms: starUniforms
+        });
+
+        const starMesh = new THREE.Mesh(starGeometry, starMaterial);
+        scene.add(starMesh);
+
+        // 4. ATMOSPHERIC CORONA (ICE-BLUE/WHITE SILVERY GLOW)
+        const coronaVertexShader = `
+            varying vec3 vNormal;
+            void main() {
+                vNormal = normalize(normalMatrix * normal);
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        const coronaFragmentShader = `
+            varying vec3 vNormal;
+            uniform vec3 uGlowColor;
+            uniform float uIntensity;
+
+            void main() {
+                float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.2) * uIntensity;
+                gl_FragColor = vec4(uGlowColor, intensity);
+                       }
+        `;
+
+        const coronaGeometry = new THREE.SphereGeometry(starRadius * 1.32, 64, 64);
+        const coronaMaterial = new THREE.ShaderMaterial({
+            vertexShader: coronaVertexShader,
+            fragmentShader: coronaFragmentShader,
+            uniforms: {
+                uGlowColor: { value: new THREE.Color(0xd1e8ff) },
+                uIntensity: { value: 1.4 }
+            },
+            blending: THREE.AdditiveBlending,
+            side: THREE.BackSide,
+            transparent: true,
+            depthWrite: false
+        });
+
+        const coronaMesh = new THREE.Mesh(coronaGeometry, coronaMaterial);
+        scene.add(coronaMesh);
+
+        // 5. OUTER CORONA HALO
+        const haloGeometry = new THREE.SphereGeometry(starRadius * 1.6, 64, 64);
+        const haloMaterial = new THREE.MeshBasicMaterial({
+            color: new THREE.Color(0xa5f3fc),
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            opacity: 0.12,
+            side: THREE.BackSide,
+            depthWrite: false
+        });
+        const haloMesh = new THREE.Mesh(haloGeometry, haloMaterial);
+        scene.add(haloMesh);
+
+        // 6. STELLAR DUST & IONIZED PARTICLES
+        const particlesCount = 800;
+        const particleGeometry = new THREE.BufferGeometry();
+        const particlePositions = new Float32Array(particlesCount * 3);
+        const particleScales = new Float32Array(particlesCount);
+
+        for (let i = 0; i < particlesCount * 3; i += 3) {
+            const u = Math.random();
+            const v = Math.random();
+            const theta = u * 2.0 * Math.PI;
+            const phi = Math.acos(2.0 * v - 1.0);
+            const r = starRadius * 1.5 + Math.random() * 35.0;
+
+            particlePositions[i] = r * Math.sin(phi) * Math.cos(theta);
+            particlePositions[i + 1] = r * Math.sin(phi) * Math.sin(theta);
+            particlePositions[i + 2] = r * Math.cos(phi);
+
+            particleScales[i / 3] = Math.random() * 2.5 + 0.5;
         }
 
-        function onPointerMove(event) {
-            // Считаем координаты движения пальца/мыши относительно центра экрана
-            mouseX = (event.clientX - windowHalfX) * 0.001;
-            mouseY = (event.clientY - windowHalfY) * 0.001;
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+
+        // Create glowing circular particle sprite
+        const particleCanvas = document.createElement('canvas');
+        particleCanvas.width = 64;
+        particleCanvas.height = 64;
+        const pCtx = particleCanvas.getContext('2d');
+        const pGrad = pCtx.createRadialGradient(32, 32, 0, 32, 32, 32);
+        pGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        pGrad.addColorStop(0.4, 'rgba(165, 243, 252, 0.6)');
+        pGrad.addColorStop(1, 'transparent');
+        pCtx.fillStyle = pGrad;
+        pCtx.fillRect(0, 0, 64, 64);
+
+        const particleTexture = new THREE.CanvasTexture(particleCanvas);
+
+        const particleMaterial = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 0.9,
+            map: particleTexture,
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            depthWrite: false
+        });
+
+        const particlesSystem = new THREE.Points(particleGeometry, particleMaterial);
+        scene.add(particlesSystem);
+
+        // 7. BACKGROUND STARRY FIELD
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsCount = 2000;
+        const starsPositions = new Float32Array(starsCount * 3);
+
+        for (let i = 0; i < starsCount * 3; i += 3) {
+            starsPositions[i] = (Math.random() - 0.5) * 800;
+            starsPositions[i + 1] = (Math.random() - 0.5) * 800;
+            starsPositions[i + 2] = (Math.random() - 0.5) * 800;
         }
 
-        function onWindowResize() {
-            windowHalfX = window.innerWidth / 2;
-            windowHalfY = window.innerHeight / 2;
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
+        starsGeometry.setAttribute('position', new THREE.BufferAttribute(starsPositions, 3));
+        const starsMaterial = new THREE.PointsMaterial({
+            color: 0xcccccc,
+            size: 1.2,
+            transparent: true,
+            opacity: 0.7
+        });
+        const starsField = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(starsField);
+
+        // 8. ANIMATION LOOP & STATE
+        let isPaused = false;
+        let rotationSpeedMultiplier = 1.0;
+        let plasmaSpeedMultiplier = 1.0;
+        const clock = new THREE.Clock();
 
         function animate() {
             requestAnimationFrame(animate);
 
-            // Плавная инерция камеры за движением пальца (эффект параллакса)
-            targetX += (mouseX - targetX) * 0.05;
-            targetY += (mouseY - targetY) * 0.05;
+            const delta = clock.getDelta();
 
-            camera.rotation.y = targetX * 1.5;
-            camera.rotation.x = targetY * 1.5;
+            if (!isPaused) {
+                const elapsedTime = clock.getElapsedTime();
+                starUniforms.uTime.value = elapsedTime;
 
-            // Медленное вращение звезд и туманностей для живой атмосферы
-            if (stars) stars.rotation.y += 0.0002;
-            if (dust)  dust.rotation.y  += 0.0004;
+                // Rotate star mesh
+                starMesh.rotation.y += 0.003 * rotationSpeedMultiplier;
 
+                // Rotate outer atmospheres slightly off-axis for depth
+                coronaMesh.rotation.y -= 0.001 * rotationSpeedMultiplier;
+                haloMesh.rotation.y += 0.0015 * rotationSpeedMultiplier;
+
+                // Rotate particle cloud slowly
+                particlesSystem.rotation.y += 0.0008 * rotationSpeedMultiplier;
+                particlesSystem.rotation.x += 0.0003 * rotationSpeedMultiplier;
+            }
+
+            controls.update();
             renderer.render(scene, camera);
         }
+
+        animate();
+
+        // 9. UI INTERACTION & EVENT HANDLERS
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Mobile UI Panel Toggle
+        const btnToggleUi = document.getElementById('btn-toggle-ui');
+        const controlsBody = document.getElementById('controls-body');
+        const uiArrow = document.getElementById('ui-arrow');
+        let uiExpanded = true;
+
+        if (btnToggleUi) {
+            btnToggleUi.addEventListener('click', () => {
+                uiExpanded = !uiExpanded;
+                controlsBody.style.display = uiExpanded ? 'flex' : 'none';
+                uiArrow.style.transform = uiExpanded ? 'rotate(0deg)' : 'rotate(-180deg)';
+            });
+        }
+
+        // Color Presets logic
+        const colorPresets = document.querySelectorAll('.color-preset');
+        colorPresets.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                colorPresets.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const mode = btn.getAttribute('data-color');
+                if (mode === 'sirius') {
+                    starUniforms.uColorTint.value.setHex(0xffffff);
+                    coronaMaterial.uniforms.uGlowColor.value.setHex(0xd1e8ff);
+                    haloMaterial.color.setHex(0xa5f3fc);
+                } else if (mode === 'ice') {
+                    starUniforms.uColorTint.value.setHex(0xa5f3fc);
+                    coronaMaterial.uniforms.uGlowColor.value.setHex(0x38bdf8);
+                    haloMaterial.color.setHex(0x0284c7);
+                } else if (mode === 'mono') {
+                    starUniforms.uColorTint.value.setHex(0x9ca3af);
+                    coronaMaterial.uniforms.uGlowColor.value.setHex(0xe5e7eb);
+                    haloMaterial.color.setHex(0x6b7280);
+                }
+            });
+        });
+
+        // Sliders
+        const sliderRotation = document.getElementById('slider-rotation');
+        const valRotation = document.getElementById('val-rotation');
+        sliderRotation.addEventListener('input', (e) => {
+            rotationSpeedMultiplier = parseFloat(e.target.value);
+            valRotation.textContent = rotationSpeedMultiplier.toFixed(1) + 'x';
+        });
+
+        const sliderGlow = document.getElementById('slider-glow');
+        const valGlow = document.getElementById('val-glow');
+        sliderGlow.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            coronaMaterial.uniforms.uIntensity.value = val;
+            haloMaterial.opacity = 0.08 * (val / 1.4);
+            valGlow.textContent = val.toFixed(1) + 'x';
+        });
+
+        const sliderPlasma = document.getElementById('slider-plasma');
+        const valPlasma = document.getElementById('val-plasma');
+        sliderPlasma.addEventListener('input', (e) => {
+            plasmaSpeedMultiplier = parseFloat(e.target.value);
+            starUniforms.uPlasmaSpeed.value = plasmaSpeedMultiplier;
+            valPlasma.textContent = plasmaSpeedMultiplier.toFixed(1) + 'x';
+        });
+
+        // Toggles & Buttons
+        const btnToggleParticles = document.getElementById('btn-toggle-particles');
+        let particlesVisible = true;
+        btnToggleParticles.addEventListener('click', () => {
+            particlesVisible = !particlesVisible;
+            particlesSystem.visible = particlesVisible;
+            btnToggleParticles.classList.toggle('active', particlesVisible);
+        });
+
+        const btnPause = document.getElementById('btn-pause');
+        const iconPause = document.getElementById('icon-pause');
+        btnPause.addEventListener('click', () => {
+            isPaused = !isPaused;
+            btnPause.classList.toggle('active', isPaused);
+            iconPause.setAttribute('data-lucide', isPaused ? 'play' : 'pause');
+            lucide.createIcons();
+        });
+
+        const btnResetCam = document.getElementById('btn-reset-cam');
+        btnResetCam.addEventListener('click', () => {
+            camera.position.set(0, 12, 60);
+            controls.target.set(0, 0, 0);
+            controls.update();
+        });
     </script>
 </body>
 </html>
