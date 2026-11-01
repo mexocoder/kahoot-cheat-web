@@ -59,7 +59,7 @@
         </button>
     </header>
 
-    <!-- Центральная область (Арт/Гифка Али и переключатель) -->
+    <!-- Центральная область (Арт Али и переключатель) -->
     <main class="flex-1 flex flex-col items-center justify-center relative my-2">
         <div id="character-container" class="relative flex flex-col items-center animate-float">
             <div class="absolute -bottom-6 w-52 h-10 bg-pink-500/40 rounded-full blur-2xl"></div>
@@ -68,7 +68,7 @@
             <div class="w-56 h-56 sm:w-72 sm:h-72 rounded-3xl glass-panel flex flex-col items-center justify-center relative overflow-hidden group border-pink-500/60 shadow-[0_0_40px_rgba(255,102,196,0.3)]">
                 <div class="absolute inset-0 bg-gradient-to-t from-purple-900/40 to-transparent z-10 pointer-events-none"></div>
                 
-                <!-- Сама картинка из папки gifs -->
+                <!-- Картинка из корня репозитория -->
                 <img id="alya-image" src="" alt="Alya" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                 
                 <span class="absolute bottom-3 z-20 font-anime text-xs text-pink-200 tracking-widest bg-black/70 px-3 py-1 rounded-full border border-pink-500/30">
@@ -77,7 +77,7 @@
             </div>
         </div>
 
-        <!-- Мини-панель выбора поз (переключает картинки из папки) -->
+        <!-- Мини-панель выбора поз -->
         <div id="poses-bar" class="flex gap-2 mt-4 z-20 overflow-x-auto max-w-full py-1 px-2">
             <!-- Кнопки генерируются скриптом автоматически -->
         </div>
@@ -126,14 +126,14 @@
             osc.stop(audioCtx.currentTime + 0.04);
         }
 
-        // --- ДАННЫЕ И ФАЙЛЫ ИЗ ПАПКИ GIFS ---
+        // --- ДАННЫЕ И ФАЙЛЫ ИЗ КОРНЯ РЕПОЗИТОРИЯ ---
         const alyaData = [
-            { file: "gifs/d3266df1bf85e1829fd468d77c617baf.jpg", quote: "Эй! Кудзэ-кун, ты вообще слушаешь, что я говорю?" },
-            { file: "gifs/5551c576b59560f27abb4388ccf51308.jpg", quote: "И... ничего я не смущаюсь! (Полный идиот...)" },
-            { file: "gifs/4273151b18c2ac7ba27173238f5eece.jpg", quote: "Hontou ni... (Ты иногда такой невозможный)." },
-            { file: "gifs/33fa168045c04487e83fb4c3558acd9c.jpg", quote: "Хм! Мог бы и побыстрее соображать!" },
-            { file: "gifs/5960767d5ef5b43674513f0c7236f650.jpg", quote: "Ну хорошо, сегодня я разрешаю тебе побыть со мной." },
-            { file: "gifs/55e682878015ac8b7cdfd8a449ac1aff.jpg", quote: "Береги себя! И... спасибо, что заглянул." }
+            { file: "d3266df1bf85e1829fd468d77c617baf.jpg", quote: "Эй! Кудзэ-кун, ты вообще слушаешь, что я говорю?" },
+            { file: "5551c576b59560f27abb4388ccf51308.jpg", quote: "И... ничего я не смущаюсь! (Полный идиот...)" },
+            { file: "4273151b18c2ac7ba27173238f5eece.jpg", quote: "Hontou ni... (Ты иногда такой невозможный)." },
+            { file: "33fa168045c04487e83fb4c3558acd9c.jpg", quote: "Хм! Мог бы и побыстрее соображать!" },
+            { file: "5960767d5ef5b43674513f0c7236f650.jpg", quote: "Ну хорошо, сегодня я разрешаю тебе побыть со мной." },
+            { file: "55e682878015ac8b7cdfd8a449ac1aff.jpg", quote: "Береги себя! И... спасибо, что заглянул." }
         ];
 
         let currentIndex = 0;
@@ -146,7 +146,6 @@
         const dialogueBox = document.getElementById('dialogue-box');
         const posesBar = document.getElementById('poses-bar');
 
-        // Создаем кнопки выбора поз внизу под картинкой
         function initPosesBar() {
             posesBar.innerHTML = "";
             alyaData.forEach((item, index) => {
@@ -166,7 +165,6 @@
             imgElement.src = alyaData[currentIndex].file;
             typeWriter(alyaData[currentIndex].quote);
             
-            // Обновляем подсветку активной кнопки
             const buttons = posesBar.querySelectorAll('button');
             buttons.forEach((btn, idx) => {
                 if (idx === currentIndex) btn.classList.add('active');
@@ -191,7 +189,6 @@
             addChar();
         }
 
-        // Клик по диалогу переключает на следующий арт/реплику
         dialogueBox.addEventListener('click', () => {
             playClickSound();
             if (isTyping) {
@@ -224,7 +221,6 @@
             }
         });
 
-        // Инициализация при старте
         window.onload = () => {
             initPosesBar();
             setAlyaPose(0);
